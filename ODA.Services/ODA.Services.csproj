@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ODA.DataAccess\ODA.DataAccess.csproj" />
+    <ProjectReference Include="..\ODA.Entity\ODA.Entity.csproj" />
+  </ItemGroup>
+
+</Project>
