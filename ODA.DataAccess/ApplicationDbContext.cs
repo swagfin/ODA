@@ -31,6 +31,7 @@ namespace ODA.DataAccess
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Restaurant> Restaurants { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<ItemCategory> ItemCategories { get; set; }
 
 
     }

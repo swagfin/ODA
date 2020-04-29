@@ -26,6 +26,7 @@ namespace ODA.Entity
         public double SellingPrice { get; set; } = 0;
         public string ImageFile { get; set; } = "no_image.png";
         public bool IsActive { get; set; } = true;
+        public bool IsFeatured { get; set; } = true;
         public int? RestaurantId { get; set; }
         public virtual Restaurant Restaurant { get; set; }
     }

@@ -6,6 +6,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ODA.DataAccess;
+using ODA.Services;
+using ODA.Services.Implementations;
 
 namespace ODA
 {
@@ -27,6 +29,12 @@ namespace ODA
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddStorage();
+            //Services
+            services.AddScoped<ICustomerService, CustomerService>();
+            services.AddScoped<IItemService, ItemService>();
+            services.AddScoped<IOrderService, OrderService>();
+            services.AddScoped<IRestaurantService, RestaurantService>();
+            services.AddScoped<IItemCategoryService, ItemCategoryService>();
             //services.AddSingleton<WeatherForecastService>();
         }
 

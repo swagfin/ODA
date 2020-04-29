@@ -1,5 +1,5 @@
 ﻿@page "/"
-
+@inject IItemService itemService
 <div>
     <div class="col-12 p-0" id="firstScreenMain" style="height: 901px;">
         <div class="block m-0 ">
@@ -7,10 +7,15 @@
         </div>
         <div class="block m-0">
             <div class="block-content pt-10">
-                <div class="block-content p-0" style="text-align:center"><img src="/assets/img/logos/logo.png" class="img-fluid" style="filter: none; width: 184px;"></div>
+                <p class="block-content p-0" align="center">
+                    <img src="/assets/img/logos/logo.png" class="img-fluid" style="filter: none; width: 184px;">
+                </p>
                 <h1 class="welcome-heading mt-10">Order from top &amp; favourite restaurants</h1>
-                <h2 class="welcome-subheading text-center mt-10 mb-10">Ready to see top restaurant to order?</h2><a class="btn btn-lg btn-setup-location" style="background-color: rgb(252, 128, 25); position: relative;" href="/search-location.html">setup your location<canvas style="border-radius: inherit; height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;" height="0" width="0"></canvas></a>
-                <p class="login-block mb-0">Have an account? <a style="color: rgb(252, 128, 25);" href="/login.html">Login</a></p>
+                <h2 class="welcome-subheading text-center mt-10 mb-10">Ready to see top restaurant to order?</h2>
+                <a class="btn btn-lg btn-setup-location" style="background-color: rgb(252, 128, 25); position: relative;" href="/search-location.html">
+                    setup your location
+                </a>
+                <p class="login-block mb-0">Have an account? <a style="color: rgb(252, 128, 25);" href="/login">Login</a></p>
             </div>
         </div>
     </div>

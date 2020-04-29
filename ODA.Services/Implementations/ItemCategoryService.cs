@@ -7,34 +7,34 @@ using System.Threading.Tasks;
 
 namespace ODA.Services.Implementations
 {
-    public class RestaurantService : IRestaurantService
+    public class ItemCategoryService : IItemCategoryService
     {
         ApplicationDbContext Db { get; set; }
 
-        public RestaurantService(ApplicationDbContext db)
+        public ItemCategoryService(ApplicationDbContext db)
         {
             this.Db = db;
         }
-        public void Add(Restaurant restaurant)
+        public void Add(ItemCategory itemCategory)
         {
-            Db.Restaurants.Add(restaurant);
+            Db.ItemCategories.Add(itemCategory);
             Db.SaveChanges();
         }
 
-        public Task AddAsync(Restaurant restaurant)
+        public Task AddAsync(ItemCategory itemCategory)
         {
             return Task.Run(() =>
             {
-                Add(restaurant);
+                Add(itemCategory);
             });
         }
 
-        public IEnumerable<Restaurant> GetAll()
+        public IEnumerable<ItemCategory> GetAll()
         {
-            return Db.Restaurants.AsNoTracking().ToList();
+            return Db.ItemCategories.AsNoTracking().ToList();
         }
 
-        public Task<IEnumerable<Restaurant>> GetAllAsync()
+        public Task<IEnumerable<ItemCategory>> GetAllAsync()
         {
             return Task.Run(() =>
             {
@@ -42,12 +42,12 @@ namespace ODA.Services.Implementations
             });
         }
 
-        public Restaurant Get(int Id)
+        public ItemCategory Get(int Id)
         {
-            return Db.Restaurants.FirstOrDefault(x => x.Id == Id);
+            return Db.ItemCategories.FirstOrDefault(x => x.Id == Id);
         }
 
-        public Task<Restaurant> GetAsync(int Id)
+        public Task<ItemCategory> GetAsync(int Id)
         {
             return Task.Run(() =>
             {
@@ -55,38 +55,38 @@ namespace ODA.Services.Implementations
             });
         }
 
-        public void Update(Restaurant restaurant)
+        public void Update(ItemCategory itemCategory)
         {
-            Db.Entry(restaurant).State = EntityState.Modified;
+            Db.Entry(itemCategory).State = EntityState.Modified;
             Db.SaveChanges();
         }
 
-        public Task UpdateAsync(Restaurant restaurant)
+        public Task UpdateAsync(ItemCategory itemCategory)
         {
             return Task.Run(() =>
             {
-                Update(restaurant);
+                Update(itemCategory);
             });
         }
 
-        public void Remove(Restaurant restaurant)
+        public void Remove(ItemCategory itemCategory)
         {
-            Db.Restaurants.Remove(restaurant);
+            Db.ItemCategories.Remove(itemCategory);
             Db.SaveChanges();
         }
 
-        public Task RemoveAsync(Restaurant restaurant)
+        public Task RemoveAsync(ItemCategory itemCategory)
         {
             return Task.Run(() =>
             {
-                Remove(restaurant);
+                Remove(itemCategory);
             });
         }
 
         public void Remove(int Id)
         {
-            var restaurant = Get(Id);
-            Remove(restaurant);
+            var itemCategory = Get(Id);
+            Remove(itemCategory);
         }
 
         public Task RemoveAsync(int Id)
@@ -96,5 +96,6 @@ namespace ODA.Services.Implementations
                 Remove(Id);
             });
         }
+
     }
 }

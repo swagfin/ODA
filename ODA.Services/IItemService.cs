@@ -11,6 +11,8 @@ namespace ODA.Services
         Task AddAsync(Item item);
         IEnumerable<Item> GetAll();
         Task<IEnumerable<Item>> GetAllAsync();
+        IEnumerable<Item> GetItemsLike(string foodLike);
+        Task<IEnumerable<Item>> GetItemsLikeAsync(string foodlike);
         Item Get(int Id);
         Task<Item> GetAsync(int Id);
         void Update(Item item);
