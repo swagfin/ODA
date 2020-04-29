@@ -1,0 +1,91 @@
+*,
+::before,
+::after {
+    box-sizing: border-box
+}
+
+html {
+    font-family: sans-serif;
+    line-height: 1.15;
+    -webkit-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    -ms-overflow-style: scrollbar
+}
+
+body {
+    margin: 0;
+    font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5;
+    color: #575757;
+    text-align: left;
+    background-color: #f5f6f7
+}
+
+img {
+    vertical-align: middle;
+    border-style: none
+}
+
+::-webkit-file-upload-button {
+    font: inherit;
+    -webkit-appearance: button
+}
+
+html,
+body {
+    font-size: 14px
+}
+
+#page-container {
+    margin: 0 auto;
+    width: 100%;
+    min-width: 320px
+}
+
+html {
+    overflow: scroll;
+    overflow-x: hidden
+}
+
+::-webkit-scrollbar {
+    width: 0;
+    background: transparent
+}
+
+body {
+    color: #282c3f !important;
+    background-color: #fff
+}
+
+ /*
+  * For the LOADER
+  */
+.no-js #loader {
+    display: none;
+}
+
+.js #loader {
+    display: block;
+    position: absolute;
+    left: 100px;
+    top: 0;
+}
+
+.page-loader {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: 100%;
+    z-index: 9999;
+    background: url(/assets/img/loading-food.gif) center no-repeat #fff;
+}
+
+ /*
+  * FOR THE SLIDER
+  */
+.slider-wrapper.secondary-slider-wrapper .slider-wrapper__img-wrapper {
+    margin-right: 1.5rem;
+}
