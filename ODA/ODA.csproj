@@ -23,9 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\ODA.DataAccess\ODA.DataAccess.csproj" />
     <ProjectReference Include="..\ODA.Entity\ODA.Entity.csproj" />
-    <ProjectReference Include="..\ODA.Services\ODA.Services.csproj" />
   </ItemGroup>
 
 </Project>
