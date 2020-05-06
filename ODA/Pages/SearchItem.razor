@@ -1,5 +1,6 @@
 ﻿@page "/search"
-@inject IItemCategoryService categoryService
+@using System.Net.Http;
+@inject HttpClient http
 <div class="col-12 p-0">
     <div class="block m-0">
         <div class="block-content p-0">
@@ -63,7 +64,7 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        itemCategories = await categoryService.GetAllAsync();
+        itemCategories = await http.GetFromJsonAsync<TodoItem[]>("api/TodoItems");
         foundResults = itemCategories;
     }
 

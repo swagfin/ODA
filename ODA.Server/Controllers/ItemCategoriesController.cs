@@ -1,20 +1,19 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
+using ODA.Entity;
+using ODA.Server.Services;
+using System;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using ODA.Entity;
-using ODA.Server.Data;
-using ODA.Server.Services;
-
 namespace ODA.Server.Controllers
 {
     public class ItemCategoriesController : Controller
     {
         private IItemCategoryService InjectedService { get; set; }
-
         public ItemCategoriesController(IItemCategoryService context)
         {
             InjectedService = context;
@@ -127,6 +126,67 @@ namespace ODA.Server.Controllers
             return RedirectToAction(nameof(Index));
         }
 
+
+
+        public async Task<IActionResult> UpdateImage(int? id)
+        {
+            if (id == null)
+                return NotFound();
+            //Get Data
+            var record = await InjectedService.GetAsync((int)id);
+            if (record == null)
+                return NotFound();
+            return View(record);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UpdateImage(int? id, IFormFile file)
+        {
+            if (id == null)
+                return NotFound();
+            //Get Data
+            var record = await InjectedService.GetAsync((int)id);
+            if (record == null)
+                return NotFound();
+
+            try
+            {
+                if (file != null)
+                {
+                    string webRoot = AppContext.BaseDirectory.Substring(0, AppContext.BaseDirectory.IndexOf("bin"));
+                    //Check Extension
+                    string[] SupportedLogoTypes = new[] { ".jpg", ".jpeg", ".png" };
+                    string SentExtension = Path.GetExtension(file.FileName);
+                    if (SupportedLogoTypes.Contains(SentExtension) == false)
+                    {
+                        ViewBag.error = "The Logo Uploaded is NOT Supported, Currently Supporting .jpg, .png, .jpeg Formats";
+                        return View(record);
+                    }
+
+                    //Else if File Is Valid
+                    string path = string.Format("{0}{1}", webRoot, "uploads\\categories\\");
+                    if (!Directory.Exists(path))
+                        Directory.CreateDirectory(path);
+                    //Proceed
+                    string SaveAsName = Guid.NewGuid().ToString() + SentExtension;
+                    using (var stream = new FileStream(path + SaveAsName, FileMode.Create))
+                    {
+                        file.CopyTo(stream);
+                    }
+                    //On Success Copied
+                    record.ImageFile = SaveAsName;
+                    await InjectedService.UpdateAsync(record);
+                }
+
+
+            }
+            catch (Exception ex)
+            {
+                ViewBag.error = "Error Occurred While Uploading: " + ex.Message;
+            }
+
+            return View(record);
+        }
 
     }
 }

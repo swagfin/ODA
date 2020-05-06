@@ -1,0 +1,58 @@
+﻿@model ODA.Entity.ItemCategory
+@{
+    ViewBag.Title = "Update Category Image";
+    string Photo = "default.png";
+    if (!string.IsNullOrWhiteSpace(Model.ImageFile))
+    {
+        Photo = Model.ImageFile;
+    }
+
+}
+
+<h3>Update @Model.Name Image</h3>
+
+<section class="container">
+
+    <div class="container segment">
+        <div class="card-header"><i class="image icon"></i>Update @Model.Name Image</div>
+
+        <p align="center">
+            This image is currently as the default <b>@Model.Name</b> Category Image, Upload new to change
+        </p>
+
+        @if (ViewBag.error != null)
+        {
+            <div class="alert-danger"><b>@ViewBag.error</b></div>
+        }
+        <div class="card">
+            <div class="image" style="max-height:400px">
+                <img src="~/uploads/categories/@Photo" alt="No Image" />
+            </div>
+        </div>
+        <div class="divider"></div>
+
+        <form method="POST" enctype="multipart/form-data" onsubmit="$(this).addClass('loading');">
+            <div class="two fields">
+                <div class="input-group" style="border:none">
+                    <input type="file" name="file" id="file" required>
+                </div>
+
+                <div class="field">
+                    <button class="btn-success">Upload new Image</button>
+                </div>
+
+            </div>
+
+            <div class="ui divider"></div>
+
+            <div style="text-align:center">
+                <a class="ui button green" asp-controller="ItemCategories/Details/@Model.Id">Good, use this Image</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</section>
+
+

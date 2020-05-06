@@ -9,29 +9,28 @@
 <div>
     <h4>ItemCategory</h4>
     <hr />
+    <img height="80" width="90" src="~/uploads/categories/@Model.ImageFile" alt="@Model.Name Image" />
+    <a class="nav-link text-dark" href="~/ItemCategories/UpdateImage/@Model.Id">Change Image</a>
     <dl class="row">
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.Name)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Name)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.ImageFile)
         </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ImageFile)
-        </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.MinimumPrice)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.MinimumPrice)
         </dd>
-        <dt class = "col-sm-2">
+        <dt class="col-sm-2">
             @Html.DisplayNameFor(model => model.WaitTimeInMin)
         </dt>
-        <dd class = "col-sm-10">
+        <dd class="col-sm-10">
             @Html.DisplayFor(model => model.WaitTimeInMin)
         </dd>
     </dl>
