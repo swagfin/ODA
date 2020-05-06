@@ -97,17 +97,5 @@ namespace ODA.Server.Services.Implementations
             });
         }
 
-        public IEnumerable<Item> GetItemsLike(string foodLike)
-        {
-            return Db.Items.Include(x => x.Restaurant).Where(x => x.ItemName.ToLower().Contains(foodLike.ToLower()) || x.Category.Contains(foodLike)).AsNoTracking().ToList();
-        }
-
-        public Task<IEnumerable<Item>> GetItemsLikeAsync(string foodlike)
-        {
-            return Task.Run(() =>
-            {
-                return GetItemsLike(foodlike);
-            });
-        }
     }
 }

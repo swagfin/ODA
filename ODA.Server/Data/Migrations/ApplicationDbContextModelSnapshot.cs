@@ -281,9 +281,6 @@ namespace ODA.Server.Data.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
-                    b.Property<bool>("IsFeatured")
-                        .HasColumnType("bit");
-
                     b.Property<string>("ItemBarcode")
                         .IsRequired()
                         .HasColumnType("nvarchar(150)")
@@ -315,30 +312,6 @@ namespace ODA.Server.Data.Migrations
                     b.HasIndex("RestaurantId");
 
                     b.ToTable("Items");
-                });
-
-            modelBuilder.Entity("ODA.Entity.ItemCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("ImageFile")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<double>("MinimumPrice")
-                        .HasColumnType("float");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("WaitTimeInMin")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ItemCategories");
                 });
 
             modelBuilder.Entity("ODA.Entity.Order", b =>
