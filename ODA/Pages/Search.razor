@@ -1,5 +1,5 @@
-﻿@page "/search"
-@using System.Net.Http;
+﻿@page "/search/{Location}"
+@inject IItemCategoryService injectService
 <div class="col-12 p-0">
     <div class="block m-0">
         <div class="block-content p-0">
@@ -9,9 +9,9 @@
                         <i class="si si-arrow-left"></i>
                     </button>
                 </div>
-                <input type="text" class="form-control search-input" @bind="SearchAs" @onkeyup="Search" placeholder="Search for food item">
+                <input type="text" class="form-control search-input" @bind="SearchAs" @onkeyup="FindItem" placeholder="Search for food item">
                 <div class="input-group-append">
-                    <button type="submit" class="btn search-navs-btns" @onclick="Search" style="position: relative;">
+                    <button type="submit" class="btn search-navs-btns" @onclick="FindItem" style="position: relative;">
                         <i class="si si-magnifier"></i>
                     </button>
                 </div>
@@ -32,11 +32,11 @@
 else
 {
     <div class="bg-white mb-50 mt-10">
-        <h5 class="px-15 mb-1 text-muted">What would you like to Eat ?</h5>
+        <h5 class="px-15 mb-1 text-muted">What would you like to Eat in @Location?</h5>
 
         @foreach (var item in foundResults)
         {
-            <CategorySearchResult Model="item" OnCategorySelected="CategorySelected" />
+            <CategorySearchResult Model="item" Location="@Location" />
         }
     </div>
 
@@ -44,26 +44,23 @@ else
 <p></p>
 
 @code {
+    [Parameter]
+    public string Location { get; set; } = string.Empty;
+
     private string SearchAs { get; set; }
-    private bool AddedCart { get; set; } = false;
 
     IEnumerable<ItemCategory> itemCategories { get; set; }
     IEnumerable<ItemCategory> foundResults { get; set; }
 
-    private void Search()
+    private void FindItem()
     {
-        if (!string.IsNullOrWhiteSpace(SearchAs))
+        if (!string.IsNullOrWhiteSpace(SearchAs) && itemCategories != null)
             foundResults = itemCategories.Where(x => x.Name.ToLower().Contains(SearchAs.ToLower()));
-    }
-
-    private void CategorySelected(ItemCategory category)
-    {
-        AddedCart = true;
     }
 
     protected override async Task OnInitializedAsync()
     {
-        // itemCategories = await http.GetFromJsonAsync<TodoItem[]>("api/TodoItems");
+        itemCategories = await injectService.GetAllAsync();
         foundResults = itemCategories;
     }
 

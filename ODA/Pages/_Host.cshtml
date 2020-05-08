@@ -26,8 +26,71 @@
     <title>ODA</title>
 </head>
 <body>
+    <style>
+        .my-reconnect-modal > div {
+            position: fixed;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            left: 0;
+            z-index: 1000;
+            overflow: hidden;
+            background-color: #fff;
+            opacity: 0.8;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        .components-reconnect-hide > div {
+            display: none;
+        }
+
+        .components-reconnect-show > div {
+            display: none;
+        }
+
+        .components-reconnect-show > .show {
+            display: block;
+        }
+
+        .components-reconnect-failed > div {
+            display: none;
+        }
+
+        .components-reconnect-failed > .failed {
+            display: block;
+        }
+
+        .components-reconnect-refused > div {
+            display: none;
+        }
+
+        .components-reconnect-refused > .refused {
+            display: block;
+        }
+    </style>
+
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div class="page-loader"></div>
+
+    <div id="components-reconnect-modal" class="my-reconnect-modal components-reconnect-hide">
+        <div class="show">
+            <p>
+               Refreshing Contents....
+            </p>
+        </div>
+        <div class="failed">
+            <p>
+                Oops! Failed to connect to Server, Check you Internet Connection :-(
+            </p>
+        </div>
+        <div class="refused">
+            <p>
+                Oops! Check your Internet Connection, Unable to Connect to server :-(
+            </p>
+        </div>
+    </div>
+
 
     <app>
         <component type="typeof(App)" render-mode="ServerPrerendered" />

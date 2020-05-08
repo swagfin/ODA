@@ -1,0 +1,70 @@
+﻿@page "/restaurants/{Location}/{SearchItem}"
+@inject IItemService injectedService
+
+<div class="height-100-percent bg-white mb-50">
+
+    <div class="col-12 p-0 sticky-top">
+        <div class="block m-0">
+            <div class="block-content p-0">
+                <div class="input-group search-box">
+                    <p class="form-control search-input"><img src="/assets/img/logos/logo.png" alt="ODA" class="store-logo"></p>
+                    <div class="input-group-append">
+                        <button onclick="location.href='/setlocation';" type="submit" class="btn nav-location truncate-text" style="position: relative; max-width: 324px;">
+                            <span><strong class="text-uppercase mr-1">@(string.IsNullOrWhiteSpace(Location) ? "Not Set" : Location.ToUpper())</strong></span><i class="si si-arrow-right nav-location-icon ml-1" style="color: rgb(252, 128, 25);"></i>
+                            <canvas style="border-radius: inherit; height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;" height="0" width="0"></canvas>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    @*<RestaurantsSlider />*@
+
+    <div class="bg-white mb-100">
+
+        @*<ItemCategorySlider />*@
+
+        <div class="bg-light sticky-top">
+            <div class="px-15 py-3 d-flex justify-content-between align-items-center">
+                <h1 class="restaurant-count mb-0 mr-2">@(TotalRestaurants > 0 ? string.Format("{0:N0} Restaurants Near {1} Selling {2}", TotalRestaurants,Location, SearchItem) : "No Restaurants found")</h1>
+                <div class="d-flex">
+                    <button class="btn btn-preference user-preferred">Place Order<i class="si si-check ml-2"></i></button>
+                </div>
+            </div>
+        </div>
+        @if (AllItems != null && AllItems.Count() > 0)
+        {
+
+            @foreach (var item in AllItems)
+            {
+                <RestaurantBlock Model="item" />
+            }
+        }
+        else
+        {
+            <Notification Message="@(string.Format("No Restaurants found in this Area: {0} having {1}",Location, SearchItem))" />
+        }
+
+    </div>
+
+    <p></p>
+
+    <BottomNavMenu Location="@Location" SearchItem="@SearchItem" />
+
+</div>
+
+
+@code {
+    [Parameter]
+    public string Location { get; set; } = string.Empty;
+    [Parameter]
+    public string SearchItem { get; set; } = string.Empty;
+    private int TotalRestaurants { get; set; } = 0;
+    private IEnumerable<Item> AllItems { get; set; }
+    protected async override Task OnInitializedAsync()
+    {
+        AllItems = await injectedService.GetAllByLocationAsync(Location);
+        TotalRestaurants = AllItems != null ? AllItems.Count() : 0;
+    }
+}

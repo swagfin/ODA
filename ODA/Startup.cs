@@ -5,7 +5,10 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using ODA.Context;
+using ODA.DataAccess;
+using ODA.Entity;
+using ODA.Services;
+using ODA.Services.Implementations;
 
 namespace ODA
 {
@@ -27,7 +30,10 @@ namespace ODA
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddStorage();
-            //services.AddSingleton<WeatherForecastService>();
+            services.AddScoped<IItemCategoryService, ItemCategoryService>();
+            services.AddScoped<IItemService, ItemService>();
+            services.AddScoped<IMapPopularPlaceService, MapPopularPlaceService>();
+            services.AddScoped<IRestaurantService, RestaurantService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

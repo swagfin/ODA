@@ -1,8 +1,67 @@
-﻿<div class="auth-error auth-error" style="margin-bottom: 4rem;">
+﻿<div class="auth-error auth-error" id="notifyAlert" style="margin-bottom: 4rem;">
     <div class="">@Message</div>
 </div>
+
 @code {
+
     [Parameter]
     public string Message { get; set; } = string.Empty;
+    [Parameter]
+    public EventCallback OnShow { get; set; }
+    [Parameter]
+    public EventCallback OnHide { get; set; }
+    private System.Timers.Timer Countdown { get; set; }
+    private bool isVisible { get; set; } = true;
+
+    protected override void OnParametersSet()
+    {
+        ShowToast(Message, ToastLevel.Info);
+    }
+    public void ShowToast(string message, ToastLevel level)
+    {
+        Message = message;
+        isVisible = true;
+        OnShow.InvokeAsync(null);
+        StartCountdown();
+    }
+
+    private void StartCountdown()
+    {
+        SetCountdown();
+
+        if (Countdown.Enabled)
+        {
+            Countdown.Stop();
+            Countdown.Start();
+        }
+        else
+        {
+            Countdown.Start();
+        }
+    }
+
+    private void SetCountdown()
+    {
+        if (Countdown == null)
+        {
+            Countdown = new System.Timers.Timer(5000);
+            Countdown.Elapsed += HideToast;
+            Countdown.AutoReset = false;
+        }
+    }
+
+    private void HideToast(object source, System.Timers.ElapsedEventArgs args)
+    {
+        isVisible = false;
+    }
+
 }
-s
+@code{
+    public enum ToastLevel
+    {
+        Info,
+        Success,
+        Warning,
+        Error
+    }
+}
