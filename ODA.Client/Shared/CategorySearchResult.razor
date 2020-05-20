@@ -1,0 +1,19 @@
+﻿<div class="col-xs-12 col-sm-12 restaurant-block">
+    <a href="/restaurants/" class="block block-link-shadow text-center light-bottom-border">
+        <div class="block-content block-content-full"><img src="/images/categories/@Model.ImageFile" alt="@Model.Name" class="restaurant-image"></div>
+        <div class="block-content block-content-full restaurant-info">
+            <div class="font-w600 mb-5">@Model.Name</div>
+            <div class="font-size-sm font-w600 truncate-text"><span class="text-muted"></span> <span style="color: rgb(252, 128, 25);">@string.Format("From Ksh.{0:N2}", Model.MinimumPrice)</span></div>
+            <div class="font-size-sm font-w600 truncate-text"><span class="text-muted">Restaurants</span> <span style="color: rgb(252, 128, 25);">@string.Format("{0:N0}", Model.WaitTimeInMin)</span></div>
+            <br>
+        </div>
+    </a>
+</div>
+
+@code{
+    //href="/restaurants/@Location/@Model.Name"
+    [Parameter]
+    public ItemCategoryViewModel Model { get; set; }
+    [Parameter]
+    public string Location { get; set; } = string.Empty;
+}

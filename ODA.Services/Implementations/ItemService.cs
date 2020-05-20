@@ -1,10 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using ODA.DataAccess;
+﻿using ODA.DataAccess;
 using ODA.Entity;
-using System;
+using System.Data.Entity;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ODA.Services.Implementations
@@ -59,7 +57,7 @@ namespace ODA.Services.Implementations
 
         public void Update(Item item)
         {
-            Db.Update(item);
+            Db.Entry(item).State = EntityState.Modified;
             Db.SaveChanges();
         }
 

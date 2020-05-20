@@ -1,4 +1,4 @@
-﻿@page "/search/{Location}"
+﻿@page "/search"
 @inject IItemCategoryService injectService
 <div class="col-12 p-0">
     <div class="block m-0">
@@ -60,6 +60,13 @@ else
 
     protected override async Task OnInitializedAsync()
     {
+        //Get Current Location
+        Location = await session.GetItem(ODAConstants.userLocation.ToString());
+        if (string.IsNullOrWhiteSpace(Location))
+        {
+            nav.NavigateTo("/setlocation");
+            return;
+        }
         itemCategories = await injectService.GetAllAsync();
         foundResults = itemCategories;
     }

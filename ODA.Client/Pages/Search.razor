@@ -1,0 +1,74 @@
+﻿@page "/search"
+@inject IItemCategoryService injectService
+<div class="col-12 p-0">
+    <div class="block m-0">
+        <div class="block-content p-0">
+            <div class="input-group search-box">
+                <div class="input-group-prepend">
+                    <button type="button" onclick="location.href='/'" class="btn search-navs-btns back-button" style="position: relative;">
+                        <i class="si si-arrow-left"></i>
+                    </button>
+                </div>
+                <input type="text" class="form-control search-input" @bind="SearchAs" @onkeyup="FindItem" placeholder="Search for food item">
+                <div class="input-group-append">
+                    <button type="submit" class="btn search-navs-btns" @onclick="FindItem" style="position: relative;">
+                        <i class="si si-magnifier"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (foundResults == null || foundResults.Count() < 1)
+{
+    <div class="d-flex justify-content-center mt-100"><img class="img-fluid explore-bg" src="/assets/img/various/explore-bg.png" alt="Search for foods"></div>
+    if (!string.IsNullOrWhiteSpace(SearchAs))
+    {
+        <Notification Message="@(string.Format(" No such category like {0}",SearchAs))" />
+    }
+
+}
+else
+{
+    <div class="bg-white mb-50 mt-10">
+        <h5 class="px-15 mb-1 text-muted">What would you like to Eat in @Location?</h5>
+
+        @foreach (var item in foundResults)
+        {
+            <CategorySearchResult Model="item" Location="@Location" />
+        }
+    </div>
+
+}
+<p></p>
+
+@code {
+
+    public string Location { get; set; } = string.Empty;
+
+    private string SearchAs { get; set; }
+
+    IEnumerable<ItemCategoryViewModel> itemCategories { get; set; }
+    IEnumerable<ItemCategoryViewModel> foundResults { get; set; }
+
+    private void FindItem()
+    {
+        if (!string.IsNullOrWhiteSpace(SearchAs) && itemCategories != null)
+            foundResults = itemCategories.Where(x => x.Name.ToLower().Contains(SearchAs.ToLower()));
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        //Get Current Location
+        Location = await session.GetItem(ODAConstants.userLocation.ToString());
+        if (string.IsNullOrWhiteSpace(Location))
+        {
+            nav.NavigateTo("/setlocation");
+            return;
+        }
+        itemCategories = await injectService.GetAllAsync();
+        foundResults = itemCategories;
+    }
+
+}

@@ -1,0 +1,36 @@
+﻿@page "/"
+<AuthorizeView>
+    <Authorized>
+        <h3>YOU ARE AUTHORIZED</h3>
+    </Authorized>
+    <NotAuthorized>
+        <h3>OOPS! NOT AUTHORIZED</h3>
+    </NotAuthorized>
+</AuthorizeView>
+<div>
+    <div class="col-12 p-0" id="firstScreenMain" style="height: 901px;">
+        <div class="block m-0 ">
+            <div class="block-content p-0" style="text-align:center"><img src="/assets/img/burger.jpg" alt="ODA" class="img-fluid" style="filter: none; width: 454px;"></div>
+        </div>
+        <div class="block m-0">
+            <div class="block-content pt-10">
+                <div class="block-content p-0" style="text-align:center"><img src="/assets/img/logos/logo.png" class="img-fluid" style="filter: none; width: 184px;"></div>
+                <h1 class="welcome-heading mt-10">Order from top &amp; favourite restaurants</h1>
+                <h2 class="welcome-subheading text-center mt-10 mb-10">Ready to see top restaurant to order?</h2>
+                <AuthorizeView>
+                    <Authorized>
+                        <h1 class="welcome-heading mt-10">Hi @context.User.Identity.Name, Welcome Back</h1>
+                        <a class="btn btn-lg btn-setup-location" style="background-color: rgb(252, 128, 25); position: relative;" href="/setlocation">Proceed</a>
+                        <p class="login-block mb-0">This is not you? <a style="color: rgb(252, 128, 25);" href="/register">Register Account</a></p>
+                    </Authorized>
+                    <NotAuthorized>
+                        <a class="btn btn-lg btn-setup-location" style="background-color: rgb(252, 128, 25); position: relative;" href="/setlocation">setup your location</a>
+                        <p class="login-block mb-0">Have an account? <a style="color: rgb(252, 128, 25);" href="/login.html">Login</a></p>
+
+                    </NotAuthorized>
+                </AuthorizeView>
+
+            </div>
+        </div>
+    </div>
+</div>

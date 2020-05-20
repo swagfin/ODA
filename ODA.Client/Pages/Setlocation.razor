@@ -1,0 +1,54 @@
+﻿@page "/setlocation"
+@attribute [Microsoft.AspNetCore.Authorization.Authorize]
+@inject IMapPopularPlaceService injectService
+<div class="col-12 p-0 pt-0">
+    <div class="google-places-autocomplete">
+        <div class="input-location-icon-field">
+            <i class="si si-magnifier"></i>
+            <input autocomplete="off" id="google-places-autocomplete-input" @bind="SearchAs" @onkeyup="FindItem" type="text" placeholder="Search your area..." class="form-control search-input search-box">
+        </div>
+    </div>
+    <button class="btn btn-rounded btn-gps btn-md ml-15 mt-4 pl-0 py-15" style="color: rgb(252, 128, 25);"><i class="si si-pointer"></i> GET MY LOCATION</button>
+</div>
+<div class="p-15 mt-15">
+    <h1 class="text-muted h4">Popular Places</h1>
+    @if (foundResults != null && foundResults.Count() > 0)
+    {
+
+        @foreach (var item in foundResults)
+        {
+            <button type="button" @onclick="@(()=>SetUserLocation(item))" class="react-reveal btn btn-rounded btn-alt-secondary btn-md mb-15 mr-15" style="position: relative; animation-fill-mode: both; backface-visibility: visible; animation-duration: 1000ms; animation-delay: 0ms; animation-iteration-count: 1; opacity: 1;">
+                @item.Place
+            </button>
+        }
+
+
+    }
+</div>
+@code {
+    private string SearchAs { get; set; }
+
+    IEnumerable<MapPopularPlaceViewModel> mapPlaces { get; set; }
+    IEnumerable<MapPopularPlaceViewModel> foundResults { get; set; }
+
+    private void FindItem()
+    {
+        if (!string.IsNullOrWhiteSpace(SearchAs) && mapPlaces != null)
+            foundResults = mapPlaces.Where(x => x.Place.ToLower().Contains(SearchAs.ToLower()));
+    }
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        mapPlaces = await injectService.GetAllAsync();
+        foundResults = mapPlaces;
+    }
+
+    private void SetUserLocation(MapPopularPlaceViewModel location)
+    {
+        //onclick = "location.href='/search/@item.Place';"
+        session.SetItem(ODAConstants.userLocation.ToString(), location.Place);
+        nav.NavigateTo("/search");
+    }
+
+}

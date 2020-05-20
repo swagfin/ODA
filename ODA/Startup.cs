@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ODA.Data;
 using ODA.DataAccess;
 using ODA.Entity;
 using ODA.Services;
@@ -30,6 +31,8 @@ namespace ODA
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddStorage();
+            //Session
+            services.AddScoped<ISessionStorageService, SessionStorageService>();
             services.AddScoped<IItemCategoryService, ItemCategoryService>();
             services.AddScoped<IItemService, ItemService>();
             services.AddScoped<IMapPopularPlaceService, MapPopularPlaceService>();
@@ -57,6 +60,8 @@ namespace ODA
 
             app.UseEndpoints(endpoints =>
             {
+                //endpoints.MapBlazorHub();
+                //Remove Prerendering
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });

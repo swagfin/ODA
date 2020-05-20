@@ -1,4 +1,5 @@
-﻿@page "/restaurants/{Location}/{SearchItem}"
+﻿@page "/restaurants"
+@page "/restaurants/{SearchItem}"
 @inject IItemService injectedService
 
 <div class="height-100-percent bg-white mb-50">
@@ -50,7 +51,7 @@
 
     <p></p>
 
-    <BottomNavMenu Location="@Location" SearchItem="@SearchItem" />
+    <BottomNavMenu />
 
 </div>
 
@@ -59,11 +60,19 @@
     [Parameter]
     public string Location { get; set; } = string.Empty;
     [Parameter]
-    public string SearchItem { get; set; } = string.Empty;
+    public string SearchItem { get; set; }
     private int TotalRestaurants { get; set; } = 0;
     private IEnumerable<Item> AllItems { get; set; }
+
+
     protected async override Task OnInitializedAsync()
     {
+        Location = await session.GetItem(ODAConstants.userLocation.ToString());
+        if (string.IsNullOrWhiteSpace(Location))
+        {
+            nav.NavigateTo("/setlocation");
+            return;
+        }
         AllItems = await injectedService.GetAllByLocationAsync(Location);
         TotalRestaurants = AllItems != null ? AllItems.Count() : 0;
     }

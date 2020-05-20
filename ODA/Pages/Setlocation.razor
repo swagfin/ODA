@@ -16,7 +16,7 @@
 
         @foreach (var item in foundResults)
         {
-            <button type="button" onclick="location.href='/search/@item.Place';" class="react-reveal btn btn-rounded btn-alt-secondary btn-md mb-15 mr-15" style="position: relative; animation-fill-mode: both; backface-visibility: visible; animation-duration: 1000ms; animation-delay: 0ms; animation-iteration-count: 1; opacity: 1;">
+            <button type="button" @onclick="@(()=>SetUserLocation(item))" class="react-reveal btn btn-rounded btn-alt-secondary btn-md mb-15 mr-15" style="position: relative; animation-fill-mode: both; backface-visibility: visible; animation-duration: 1000ms; animation-delay: 0ms; animation-iteration-count: 1; opacity: 1;">
                 @item.Place
             </button>
         }
@@ -27,8 +27,12 @@
 @code {
     private string SearchAs { get; set; }
 
-    IEnumerable<MapPopularPlace> mapPlaces { get; set; }
-    IEnumerable<MapPopularPlace> foundResults { get; set; }
+    IEnumerable<MapPopularPlace>
+    mapPlaces
+    { get; set; }
+    IEnumerable<MapPopularPlace>
+        foundResults
+    { get; set; }
 
     private void FindItem()
     {
@@ -42,4 +46,12 @@
         mapPlaces = await injectService.GetAllAsync();
         foundResults = mapPlaces;
     }
+
+    private void SetUserLocation(MapPopularPlace location)
+    {
+        //onclick = "location.href='/search/@item.Place';"
+        session.SetItem(ODAConstants.userLocation.ToString(), location.Place);
+        nav.NavigateTo("/search");
+    }
+
 }
