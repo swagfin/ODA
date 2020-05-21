@@ -52,7 +52,7 @@
     private void SetUserLocation(MapPopularPlace location)
     {
         //onclick = "location.href='/search/@item.Place';"
-        session.SetItem(ODAConstants.userLocation.ToString(), location.Place);
+        session.SetItemAsync(ODAConstants.userLocation.ToString(), location.Place);
         nav.NavigateTo("/search");
     }
 

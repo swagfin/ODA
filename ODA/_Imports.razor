@@ -6,11 +6,12 @@
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.JSInterop
 @using ODA
+@using ODA.Auth
 @using ODA.Entity
 @using ODA.Data
 @using ODA.Shared
 @using ODA.Services
-@using Blazor.Extensions.Storage
-@inject ISessionStorageService session
+@inject IServiceProvider ServiceProvider
+@inject Blazored.SessionStorage.ISessionStorageService session
 @inject IJSRuntime js
 @inject NavigationManager nav

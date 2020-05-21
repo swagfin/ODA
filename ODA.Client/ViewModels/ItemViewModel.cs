@@ -27,6 +27,18 @@ namespace ODA.Client.ViewModels
         public string ImageFile { get; set; } = "no_image.png";
         public bool IsActive { get; set; } = true;
         public int? RestaurantId { get; set; }
+        public bool IsFeaturd { get; set; } = false;
+        public DateTime DateRegistered { get; set; } = DateTime.Now;
+        public bool IsNew
+        {
+            get
+            {
+                int daysSinceAdded = (DateTime.Now.Date - DateRegistered.Date).Days;
+                if (daysSinceAdded < 3)
+                    return true;
+                return false;
+            }
+        }
         public virtual RestaurantViewModel Restaurant { get; set; }
     }
 }

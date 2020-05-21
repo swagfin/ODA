@@ -1,22 +1,31 @@
 ﻿<div class="col-xs-12 col-sm-12 restaurant-block">
-    <a class="block text-center mb-3" href="/restaurant/?refer=wing-machine-college-y6xiMMFYajWpDwV">
+    <a class="block text-center mb-3" href="/restaurant/@Model.RestaurantId/@Model.ItemName">
+
         <div class="block-content block-content-full ribbon ribbon-bookmark ribbon-warning pt-2 ">
-            <div class="ribbon-box">Featured</div><img alt="@Model.ItemName" src="/images/items/@Model.ImageFile" class="react-reveal restaurant-image" style="animation-fill-mode: both; animation-duration: 500ms; animation-delay: 0ms; animation-iteration-count: 1; opacity: 1; animation-name: react-reveal-814509459845526-5;">
+            @if (Model.IsFeaturd)
+            {
+                <div class="ribbon-box">Featured</div>
+            }
+            <img alt="@Model.ItemName" src="/images/items/@Model.ImageFile" class="react-reveal restaurant-image" style="animation-fill-mode: both; animation-duration: 500ms; animation-delay: 0ms; animation-iteration-count: 1; opacity: 1; animation-name: react-reveal-814509459845526-5;">
         </div>
+
         <div class="block-content block-content-full restaurant-info">
             <div class="font-w600 mb-5 text-dark">@(Model.Restaurant !=null ? Model.Restaurant.RegisteredName : "Undefined Restaurant")</div>
             <div class="font-size-sm text-muted truncate-text text-muted">@Model.ItemName</div>
             <hr class="my-10">
             <div class="text-center restaurant-meta mt-5 d-flex align-items-center justify-content-between text-muted">
-                <div class="col-2 p-0 text-left"><i class="fa fa-star pr-1" style="color: rgb(252, 128, 25);"></i>@(Model.Restaurant !=null ? Model.Restaurant.Rating.ToString() : "1")</div>
-                <div class="col-4 p-0 text-center">
+                <div class="col-2 p-0 text-left" style="font-weight:bold"><i class="fa fa-star pr-1" style="color: rgb(252, 128, 25);"></i>@(Model.Restaurant !=null ? Model.Restaurant.Rating.ToString() : "1")</div>
+                <div class="col-4 p-0 text-center" style="font-weight:bold">
                     <i class="si si-clock pr-1"></i>
                     @if (Model.Restaurant != null)
                     {
-                        @(Model.Restaurant.IsOpened ? "Opened" : "Closed");
-                    }
+                        @if (Model.Restaurant.IsOpened)
+                        {<span style="color:green">Opened</span>}
+                        else
+                        { <span style="color:orangered">Closed</span>};
+}
                 </div>
-                <div class="col-6 p-0 text-center"><i class="si si-wallet pr-1"></i>@Model.SellingPrice</div>
+                <div class="col-6 p-0 text-center" style="font-weight:bold"><i class="si si-wallet pr-1"></i>Ksh. @Model.SellingPrice</div>
             </div>
         </div>
     </a>

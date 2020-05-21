@@ -1,4 +1,4 @@
-using Blazor.Extensions.Storage;
+using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ODA.Auth;
 using ODA.Context;
-using ODA.Data;
 using ODA.Services;
 using ODA.Services.Implementations;
 
@@ -31,13 +30,18 @@ namespace ODA
             services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            services.AddStorage();
-
-            services.AddAuthenticationCore();
-            services.AddAuthorizationCore();
+            // services.AddStorage();
+            services.AddControllersWithViews();
+            services.AddAuthorization();
+            services.AddAuthentication();
+            services.AddBlazoredSessionStorage();
+            services.AddSingleton<UserSessionStorage>();
             services.AddScoped<AuthenticationStateProvider, ODAAuthStateProvider>();
+            //services.AddAuthenticationCore();
+            //services.AddAuthorizationCore();
+            //services.AddScoped<AuthenticationStateProvider, ODAAuthStateProvider>();
             //Session
-            services.AddScoped<ISessionStorageService, SessionStorageService>();
+            /// services.AddScoped<ISessionStorageService, SessionStorageService>();
             services.AddScoped<IItemCategoryService, ItemCategoryService>();
             services.AddScoped<IItemService, ItemService>();
             services.AddScoped<IMapPopularPlaceService, MapPopularPlaceService>();
@@ -65,11 +69,12 @@ namespace ODA
 
             app.UseEndpoints(endpoints =>
             {
-                //endpoints.MapBlazorHub();
                 //Remove Prerendering
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
+
+
         }
     }
 }

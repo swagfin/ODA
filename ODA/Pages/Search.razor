@@ -61,7 +61,7 @@ else
     protected override async Task OnInitializedAsync()
     {
         //Get Current Location
-        Location = await session.GetItem(ODAConstants.userLocation.ToString());
+        Location = await session.GetItemAsync<string>(ODAConstants.userLocation.ToString());
         if (string.IsNullOrWhiteSpace(Location))
         {
             nav.NavigateTo("/setlocation");

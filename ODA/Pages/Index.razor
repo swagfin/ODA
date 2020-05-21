@@ -1,4 +1,28 @@
 ﻿@page "/"
+<AuthorizeView>
+    <Authorized>
+        <p>The login I did</p>
+    </Authorized>
+    <NotAuthorized>
+        <p>The login I must do</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+<AuthorizeView Roles="Administrator">
+    <p>Yes, me Admin</p>
+</AuthorizeView>
+
+<AuthorizeView Roles="Moderator">
+    <p>Yes, me Mod</p>
+</AuthorizeView>
+
+<AuthorizeView Roles="User">
+    <p>Oh no, me user</p>
+</AuthorizeView>
+
+<AuthorizeView Roles="Administrator, Moderator">
+    <p>Yes, we both nice</p>
+</AuthorizeView>
 <div>
     <div class="col-12 p-0" id="firstScreenMain" style="height: 901px;">
         <div class="block m-0 ">

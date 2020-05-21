@@ -27,6 +27,8 @@ namespace ODA.Server.Entity
         public string ImageFile { get; set; } = "no_image.png";
         public bool IsActive { get; set; } = true;
         public int? RestaurantId { get; set; }
+        public bool IsFeaturd { get; set; } = false;
+        public DateTime DateRegistered { get; set; } = DateTime.Now;
         public virtual Restaurant Restaurant { get; set; }
     }
 }

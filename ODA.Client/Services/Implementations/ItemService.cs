@@ -2,6 +2,7 @@
 using ODA.Client.ViewModels;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Threading.Tasks;
 
@@ -29,7 +30,13 @@ namespace ODA.Client.Services.Implementations
 
         public Task<IEnumerable<ItemViewModel>> GetAllByLocationAsync(string location)
         {
-            return Api.GetJsonAsync<IEnumerable<ItemViewModel>>(BaseHelper.GetServerApi($"Items"));
+            return Task.Run(async () =>
+            {
+                var allItems = await Api.GetJsonAsync<IEnumerable<ItemViewModel>>(BaseHelper.GetServerApi($"Items"));
+                if (!string.IsNullOrWhiteSpace(location))
+                    return allItems.Where(x => x.Restaurant.Location.Contains(location)).ToList();
+                return allItems;
+            });
         }
 
         public Task<ItemViewModel> GetAsync(int Id)
