@@ -29,7 +29,7 @@ namespace ODA.Client.Services.Implementations
 
         public Task<IEnumerable<ItemViewModel>> GetAllByLocationAsync(string location)
         {
-            return Api.GetJsonAsync<IEnumerable<ItemViewModel>>(BaseHelper.GetServerApi("Items"));
+            return Api.GetJsonAsync<IEnumerable<ItemViewModel>>(BaseHelper.GetServerApi($"Items"));
         }
 
         public Task<ItemViewModel> GetAsync(int Id)

@@ -20,8 +20,10 @@
                 @item.Place
             </button>
         }
-
-
+    }
+    else if (foundResults == null)
+    {
+        <div><i>Fetching popular places.....</i></div>
     }
 </div>
 @code {

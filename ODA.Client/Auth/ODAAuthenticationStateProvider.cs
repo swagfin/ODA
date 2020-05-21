@@ -13,9 +13,11 @@ namespace ODA.Client.Auth
         {
             var demoAccountIdentity = new ClaimsIdentity(new List<Claim>
             {
-                new Claim("key1","value1"), //Sample of Claims // The Belong to u
+                //new Claim("key1","value1"), //Sample of Claims // The Belong to u
                 new Claim(ClaimTypes.Name,"George Wainaina"), //Name 
-                new Claim(ClaimTypes.Email,"georgewainaina@gmail.com"),
+                new Claim(ClaimTypes.NameIdentifier,"sdfdsf"),
+                new Claim(ClaimTypes.GivenName,"SADSAD"),
+                //new Claim(ClaimTypes.Email,"georgewainaina@gmail.com"),
                 new Claim(ClaimTypes.Role,"Admin") //use this in Components specific Role
             });
             //You Can Use 

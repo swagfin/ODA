@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using ODA.Client.Auth;
 using ODA.Client.Services;
 using ODA.Client.Services.Implementations;
@@ -23,9 +24,10 @@ namespace ODA.Client
             builder.Services.AddScoped<IItemService, ItemService>();
             builder.Services.AddScoped<IMapPopularPlaceService, MapPopularPlaceService>();
             builder.Services.AddScoped<IRestaurantService, RestaurantService>();
-            builder.Services.AddAuthorizationCore();
-            builder.Services.TryAddSingleton<AuthenticationStateProvider, ODAAuthenticationStateProvider>();
 
+            builder.Services.AddAuthorizationCore();
+
+            builder.Services.AddScoped<AuthenticationStateProvider,ODAAuthenticationStateProvider>();
         }
         public static async Task Main(string[] args)
         {

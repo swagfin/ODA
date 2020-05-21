@@ -1,5 +1,4 @@
 ﻿@page "/setlocation"
-@attribute [Microsoft.AspNetCore.Authorization.Authorize]
 @inject IMapPopularPlaceService injectService
 <div class="col-12 p-0 pt-0">
     <div class="google-places-autocomplete">
@@ -24,6 +23,10 @@
 
 
     }
+    else if (foundResults == null)
+    {
+        <div><i>Fetching popular places.....</i></div>
+    }
 </div>
 @code {
     private string SearchAs { get; set; }
@@ -47,7 +50,7 @@
     private void SetUserLocation(MapPopularPlaceViewModel location)
     {
         //onclick = "location.href='/search/@item.Place';"
-        session.SetItem(ODAConstants.userLocation.ToString(), location.Place);
+        session.SetItem(ODAConstants.userLocation.ToString(), location.Place);        
         nav.NavigateTo("/search");
     }
 

@@ -7,6 +7,7 @@ namespace ODA.Client
 {
     public enum ODAConstants
     {
-        userLocation
+        userLocation,
+        userID,
     }
 }

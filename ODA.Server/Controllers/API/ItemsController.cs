@@ -22,10 +22,13 @@ namespace ODA.Server.Controllers.API
         }
 
         // GET: api/Items
-        [HttpGet]
         public async Task<ActionResult<IEnumerable<Item>>> GetItems()
         {
-            return await _context.Items.ToListAsync();
+            //Returns only those With Valid Restaurants
+            return await Task.Run(() =>
+            {
+                return _context.Items.Include(x => x.Restaurant).Where(x => x.Restaurant != null).ToList();
+            });
         }
 
         // GET: api/Items/5

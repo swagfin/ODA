@@ -28,25 +28,31 @@
 
         <div class="bg-light sticky-top">
             <div class="px-15 py-3 d-flex justify-content-between align-items-center">
-                <h1 class="restaurant-count mb-0 mr-2">@(TotalRestaurants > 0 ? string.Format("{0:N0} Restaurants Near {1} Selling {2}", TotalRestaurants,Location, Search) : "No Restaurants found")</h1>
+                <h1 class="restaurant-count mb-0 mr-2">@(string.Format("Restaurants Near {1} Selling {2}",Location, Search))</h1>
                 <div class="d-flex">
                     <button class="btn btn-preference user-preferred">Place Order<i class="si si-check ml-2"></i></button>
                 </div>
             </div>
         </div>
-        @if (AllItems != null && AllItems.Count() > 0)
-        {
-
-            @foreach (var item in AllItems)
+        @{
+            var dataSync = AllItems;
+            if (Search != null && dataSync != null)
             {
-                <RestaurantBlock Model="item" />
+                dataSync = dataSync.Where(x => x.Category.Contains(Search)).ToList();
+            }
+            //Looop All
+            if (dataSync != null && dataSync.Count() > 0)
+            {
+                @foreach (var item in dataSync)
+                {
+                    <RestaurantBlock Model="item" />
+                }
+            }
+            else
+            {
+                <Notification Message="@(string.Format("No Restaurants found in this Area: {0} having {1}",Location, Search))" />
             }
         }
-        else
-        {
-            <Notification Message="@(string.Format("No Restaurants found in this Area: {0} having {1}",Location, Search))" />
-        }
-
     </div>
 
     <p></p>
@@ -58,10 +64,8 @@
 
 @code {
     [Parameter]
-    public string Search { get; set; } = "Foodie";
+    public string Search { get; set; }
     public string Location { get; set; }
-
-    private int TotalRestaurants { get; set; } = 0;
     private IEnumerable<ItemViewModel> AllItems { get; set; }
 
 
@@ -74,6 +78,8 @@
             return;
         }
         AllItems = await injectedService.GetAllByLocationAsync(Location);
-        TotalRestaurants = AllItems != null ? AllItems.Count() : 0;
+        //Manual Hard Coding
+        AllItems = AllItems.Where(x => x.Restaurant != null && x.Restaurant.Location.Contains(Location)).ToList();
+
     }
 }

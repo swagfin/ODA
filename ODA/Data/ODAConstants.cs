@@ -7,6 +7,7 @@ namespace ODA
 {
     public enum ODAConstants
     {
-        userLocation
+        userLocation,
+        userId
     }
 }

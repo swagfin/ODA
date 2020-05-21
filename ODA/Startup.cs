@@ -1,13 +1,14 @@
 using Blazor.Extensions.Storage;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ODA.Auth;
+using ODA.Context;
 using ODA.Data;
-using ODA.DataAccess;
-using ODA.Entity;
 using ODA.Services;
 using ODA.Services.Implementations;
 
@@ -31,6 +32,10 @@ namespace ODA
             services.AddRazorPages();
             services.AddServerSideBlazor();
             services.AddStorage();
+
+            services.AddAuthenticationCore();
+            services.AddAuthorizationCore();
+            services.AddScoped<AuthenticationStateProvider, ODAAuthStateProvider>();
             //Session
             services.AddScoped<ISessionStorageService, SessionStorageService>();
             services.AddScoped<IItemCategoryService, ItemCategoryService>();

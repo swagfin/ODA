@@ -1,12 +1,4 @@
 ﻿@page "/"
-<AuthorizeView>
-    <Authorized>
-        <h3>YOU ARE AUTHORIZED</h3>
-    </Authorized>
-    <NotAuthorized>
-        <h3>OOPS! NOT AUTHORIZED</h3>
-    </NotAuthorized>
-</AuthorizeView>
 <div>
     <div class="col-12 p-0" id="firstScreenMain" style="height: 901px;">
         <div class="block m-0 ">
@@ -34,3 +26,17 @@
         </div>
     </div>
 </div>
+@code{
+    bool IsAuthenticated { get; set; }
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        string Location = await session.GetItem(ODAConstants.userLocation.ToString());
+        //If Location is Already Set
+        if (!string.IsNullOrWhiteSpace(Location))
+        {
+            nav.NavigateTo("/restaurants");
+            return;
+        }
+    }
+
+}

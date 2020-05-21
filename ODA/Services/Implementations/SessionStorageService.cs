@@ -1,14 +1,12 @@
 ﻿using Microsoft.JSInterop;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
-namespace ODA.Data
+namespace ODA.Services.Implementations
 {
     public class SessionStorageService : ISessionStorageService
     {
         private IJSRuntime js { get; set; }
+
         public SessionStorageService(IJSRuntime runtime)
         {
             js = runtime;
@@ -24,6 +22,5 @@ namespace ODA.Data
             //return localStorage.getItem(key);
             return await js.InvokeAsync<string>("localStorage.getItem", key);
         }
-
     }
 }
