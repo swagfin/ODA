@@ -70,6 +70,7 @@
         Location = await session.GetItemAsync<string>(ODAConstants.userLocation.ToString());
         if (string.IsNullOrWhiteSpace(Location))
         {
+            //Check if User is Authenticated
             nav.NavigateTo("/setlocation");
             return;
         }

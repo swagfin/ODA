@@ -1,6 +1,7 @@
 ﻿using Blazored.SessionStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Newtonsoft.Json;
+using ODA.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,29 +11,18 @@ namespace ODA.Auth
 {
     public class ODAAuthStateProvider : AuthenticationStateProvider
     {
-        //public override Task<AuthenticationState> GetAuthenticationStateAsync()
-        //{
-        //    var authUserIdentity = new ClaimsIdentity(new List<Claim>
-        //    {
-        //        new Claim("key1","someValue"),
-        //        new Claim(ClaimTypes.Name,"George Wainaina"),
-        //        new Claim(ClaimTypes.Email,"georgewainaina@gmail.com")
-        //    });
-
-
-        //    return Task.FromResult(new AuthenticationState(new ClaimsPrincipal(authUserIdentity)));
-        //}
-
-        private const string USER_SESSION_OBJECT_KEY = "user_session_obj";
-
-        private byte[] authenticationKey, cryptographyKey;
+        private string USER_SESSION_OBJECT_KEY { get; }
+        private string USER_SESSION_ENCRYPTION_KEY { get; }
         private ISessionStorageService storageService;
+        private IEncryptionAlgorithimService encryptService;
 
-        public ODAAuthStateProvider(ISessionStorageService storageService)
+        public ODAAuthStateProvider(ISessionStorageService storageService, IEncryptionAlgorithimService algorithimService)
         {
             this.storageService = storageService;
-            authenticationKey = AuthenticatedEncryption.AuthenticatedEncryption.NewKey();
-            cryptographyKey = AuthenticatedEncryption.AuthenticatedEncryption.NewKey();
+            this.encryptService = algorithimService;
+            USER_SESSION_OBJECT_KEY = ODAConstants.userId.ToString();
+            //Hard Coded the Encrption Key
+            USER_SESSION_ENCRYPTION_KEY = "5a1b2aecd5a5027963c2b9c6e1f0be6B";
         }
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
@@ -46,17 +36,18 @@ namespace ODA.Auth
         }
         public async Task<User> GetUserSession()
         {
-            string encryptedObj = await storageService.GetItemAsync<string>(USER_SESSION_OBJECT_KEY);
 
-            // no active user session found!
-            if (string.IsNullOrEmpty(encryptedObj))
-                return null;
-            string decryptedObj = AuthenticatedEncryption.AuthenticatedEncryption.Decrypt(encryptedObj, cryptographyKey, authenticationKey);
             try
             {
+                string encryptedObj = await storageService.GetItemAsync<string>(USER_SESSION_OBJECT_KEY);
+                // no active user session found!
+                if (string.IsNullOrEmpty(encryptedObj))
+                    return null;
+                //else Decypt
+                string decryptedObj = encryptService.Decrypt(encryptedObj, this.USER_SESSION_ENCRYPTION_KEY);
                 return JsonConvert.DeserializeObject<User>(decryptedObj);
             }
-            catch
+            catch (Exception)
             {
                 // user could have modified to local value, leading to an
                 // invalid decrypted object. Hence, the user just did destory
@@ -70,7 +61,6 @@ namespace ODA.Auth
         {
             // store the session information in the client's storage.
             await SetUserSession(user);
-
             // notify the authentication state provider.
             NotifyAuthenticationStateChanged(GenerateAuthenticationState(user));
         }
@@ -86,14 +76,22 @@ namespace ODA.Auth
 
 
 
-        private async Task SetUserSession(User user) => await storageService.SetItemAsync(USER_SESSION_OBJECT_KEY,
-            AuthenticatedEncryption.AuthenticatedEncryption.Encrypt(JsonConvert.SerializeObject(user), cryptographyKey, authenticationKey));
+        private async Task SetUserSession(User user)
+        {
+            //Serialize
+            string userString = JsonConvert.SerializeObject(user);
+            //Encrpt
+            string userEncrptedString = encryptService.Encrypt(userString, this.USER_SESSION_ENCRYPTION_KEY);
+            //Save in Session
+            await storageService.SetItemAsync(USER_SESSION_OBJECT_KEY, userEncrptedString);
+        }
 
         private Task<AuthenticationState> GenerateAuthenticationState(User user)
         {
             ClaimsIdentity claimsIdentity = new ClaimsIdentity(new[]
             {
-                new Claim(ClaimTypes.Name, user.Id.ToString()),
+                new Claim(ClaimTypes.Name, user.EmailAddress),
+                new Claim(ClaimTypes.NameIdentifier, user.Id),
                 new Claim(ClaimTypes.Role, user.Role.ToString())
             }, "apiauth_type");
 

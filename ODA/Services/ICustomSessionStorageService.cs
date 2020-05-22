@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 
 namespace ODA.Services
 {
-    public interface ISessionStorageService
+    public interface ICustomSessionStorageService
     {
         void SetItem(string key, string value);
         Task<string> GetItem(string key);

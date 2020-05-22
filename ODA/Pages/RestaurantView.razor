@@ -1,6 +1,8 @@
 ﻿@page "/restaurant/{RestaurantId:int}"
 @page "/restaurant/{RestaurantId:int}/{SearchItem}"
 <div>
+    <TopBackNavBar NavigationLink="/restaurants" />
+
     <div class="height-25 bg-white">
 
         <a class="no-click">
@@ -47,7 +49,8 @@
         <!--Recommended Items-->
         @if (!string.IsNullOrWhiteSpace(SearchItem) && Model.Items != null)
         {
-            var foundItems = Model.Items.Where(x => x.ItemName.ToLower().Contains(SearchItem.ToLower())).ToList();
+            //Take Only 8
+            var foundItems = Model.Items.Where(x => x.ItemName.ToLower().Contains(SearchItem.ToLower())).Take(8).ToList();
             if (foundItems.Count > 0)
             {
                 <div class="px-5">
@@ -65,10 +68,10 @@
                                                 <br><span class="meta-price"><span>Ksh.  @string.Format("{0:N2}", item.SellingPrice)</span></span>
                                             </div>
                                             <div class="d-flex btn-group btn-group-sm my-5 btn-full justify-content-around" role="group" aria-label="btnGroupIcons1">
-                                                <button type="button" class="btn btn-add-remove">
+                                                <button type="button" @onclick="@(()=>ReduceItem(item))" class="btn btn-add-remove">
                                                     <span class="btn-dec">-</span>
                                                 </button>
-                                                <button type="button" class="btn btn-add-remove">
+                                                <button type="button" @onclick="@(()=>AddItem(item))" class="btn btn-add-remove">
                                                     <span class="btn-inc">+</span>
                                                 </button>
                                             </div>
@@ -108,10 +111,10 @@
                                     </div>
                                     <div class="item-actions pull-right pb-0 mt-10">
                                         <div class="btn-group btn-group-sm" role="group" aria-label="btnGroupIcons1">
-                                            <button type="button" class="btn btn-add-remove">
+                                            <button type="button" @onclick="@(()=>ReduceItem(other))" class="btn btn-add-remove">
                                                 <span class="btn-dec">-</span>
                                             </button>
-                                            <button type="button" class="btn btn-add-remove">
+                                            <button type="button" @onclick="@(()=>AddItem(other))" class="btn btn-add-remove">
                                                 <span class="btn-inc">+</span>
                                             </button>
                                         </div>
@@ -130,7 +133,19 @@
 
 
 
-<BottomNavMenu />
+@if (CartUpdated)
+{
+    <CartStatusBottomNav>
+        <span class="re-renderer"></span>
+    </CartStatusBottomNav>
+}
+else
+{
+    <BottomNavMenu>
+        <span class="re-renderer"></span>
+    </BottomNavMenu>
+}
+
 
 @code{
 
@@ -140,12 +155,25 @@
     public string SearchItem { get; set; }
     [Inject]
     IRestaurantService InjectedService { get; set; }
+    [Inject]
+    ICartService ShoppingCart { get; set; }
     private Restaurant Model { get; set; } = new Restaurant();
 
-    public void FindItem()
+    private bool CartUpdated { get; set; } = false;
+
+    public async Task AddItem(Item item)
     {
-        StateHasChanged();
+        await ShoppingCart.AddItemAsync(item);
+        CartUpdated = true;
     }
+    public async Task ReduceItem(Item item)
+    {
+        await ShoppingCart.ReduceItemAsync(item);
+        CartUpdated = true;
+    }
+
+
+
     protected override async Task OnInitializedAsync()
     {
         //Get Restaurant By Id

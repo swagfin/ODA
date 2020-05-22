@@ -8,6 +8,7 @@ namespace ODA
     public enum ODAConstants
     {
         userLocation,
-        userId
+        userId,
+        shoppingCart
     }
 }

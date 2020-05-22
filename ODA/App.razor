@@ -2,7 +2,8 @@
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)">
             <Authorizing>
-                <span><i>Authenticating you... just a sec</i></span>
+                <span style="display:none"><i>Authenticating you... just a sec</i></span>
+                <div class="page-loader"></div>
             </Authorizing>
         </AuthorizeRouteView>
     </Found>

@@ -1,4 +1,5 @@
-﻿<div class="content pt-10 py-5 font-size-xs clearfix footer-fixed">
+﻿@inject ICartService ShoppingCart
+<div class="content pt-10 py-5 font-size-xs clearfix footer-fixed">
     <a class="col footer-links px-2 py-1 active" aria-current="page" href="/restaurants">
         <i class="si si-pointer fa-2x"></i> <br><span class="active-footer-tab">Near Me</span>
     </a>
@@ -7,10 +8,35 @@
     </a>
 
     <a class="col footer-links px-2 py-1 active" aria-current="page" href="/cart">
-        <i class="si si-bag fa-2x"></i> <br><span class="">Cart<span class="cart-quantity-badge" style="background-color: rgb(252, 128, 25);">3</span></span>
+        <i class="si si-bag fa-2x"></i> <br><span class="">
+            Cart
+            <span class="cart-quantity-badge" style="background-color: rgb(252, 128, 25);">@CartItems</span>
+        </span>
     </a>
-    <a class="col footer-links px-2 py-1 active" aria-current="page" href="/">
-        <i class="si si-user fa-2x"></i> <br><span class="">Account</span>
-    </a>
+    <AuthorizeView>
+        <Authorized>
+            <a class="col footer-links px-2 py-1 active" aria-current="page" href="/">
+                <i class="si si-user fa-2x"></i> <br><span class="">My Account</span>
+            </a>
+        </Authorized>
+        <NotAuthorized>
+            <a class="col footer-links px-2 py-1 active" aria-current="page" href="/login">
+                <i class="si si-user fa-2x"></i> <br><span class="">Login/Register</span>
+            </a>
+        </NotAuthorized>
+    </AuthorizeView>
 
+    @ChildContent
 </div>
+
+@code{
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    private int CartItems { get; set; } = 0;
+
+    //During Update
+    protected override async Task OnParametersSetAsync()
+    {
+        CartItems = await ShoppingCart.GetTotalItemsAsync();
+    }
+}

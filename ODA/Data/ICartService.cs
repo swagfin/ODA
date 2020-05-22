@@ -1,31 +1,23 @@
 ﻿using ODA.Entity;
-using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace ODA.Data
 {
     public interface ICartService
     {
-        List<OrderItem> GetShoppingList();
-        void AddItem(OrderItem item);
-        void AddItem(Item item, int Quantity = 1);
-        void RemoveItem(OrderItem item);
-        void RemoveItemByItemId(int itemId);
-        OrderItem GetCartItemByItemId(int? itemId);
-        OrderItem GetCartItemByBarcode(string ItemBarcode);
-
-        double GetSubTotal();
-        double GetTotalDue();
-        double GetTotalDiscount();
-        double GetTotalTax();
-
-        int GetTotalItems();
-        bool VerifyCanCheckout();
-
-        void EmptyShoppingCart();
+        Task AddItemAsync(Item item, int Quantity = 1);
+        Task AddItemAsync(OrderItem item);
+        Task EmptyShoppingCartAsync();
+        Task<List<OrderItem>> GetShoppingListAsync();
+        Task<double> GetSubTotal();
+        Task<double> GetTotalDiscount();
+        Task<double> GetTotalDueAsync();
+        Task<int> GetTotalItemsAsync();
+        Task<double> GetTotalTaxAsync();
+        Task ReduceItemAsync(Item item);
+        Task RemoveItem(OrderItem item);
+        Task RemoveItemByItemId(int itemId);
+        Task<string> VerifyCanCheckoutMessage();
     }
 }

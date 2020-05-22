@@ -1,29 +1,51 @@
-﻿using ODA.Entity;
+﻿using Blazored.SessionStorage;
+using Microsoft.JSInterop;
+using ODA.Entity;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 
 namespace ODA.Data
 {
     public class CartService : ICartService
     {
-
-        private List<OrderItem> Cart;
-        public CartService()
+        private ISessionStorageService StorageService { get; }
+        public CartService(ISessionStorageService storage)
         {
-            //Instantiate New
-            if (GetShoppingList() == null)
-                EmptyShoppingCart();
-        }
-        public List<OrderItem> GetShoppingList()
-        {
-            return Cart;
+            StorageService = storage;
         }
 
-
-        public void AddItem(OrderItem item)
+        public async Task<List<OrderItem>> GetShoppingListAsync()
         {
-            var existItem = GetCartItemByItemId(item.ItemId);
+            List<OrderItem> cart = await StorageService.GetItemAsync<List<OrderItem>>(ODAConstants.shoppingCart.ToString());
+            if (cart == null)
+            {
+                cart = new List<OrderItem>();
+                await EmptyShoppingCartAsync();
+            }
+            return await Task.FromResult(cart);
+        }
+
+
+        private Task PushShoppingCartAsync(List<OrderItem> cart)
+        {
+            if (cart == null)
+                cart = new List<OrderItem>();
+            return StorageService.SetItemAsync(ODAConstants.shoppingCart.ToString(), cart);
+        }
+        public Task EmptyShoppingCartAsync()
+        {
+            return StorageService.SetItemAsync(ODAConstants.shoppingCart.ToString(), new List<OrderItem>());
+        }
+
+
+
+        public async Task AddItemAsync(OrderItem item)
+        {
+            List<OrderItem> Cart = await GetShoppingListAsync();
+            var existItem = Cart.FirstOrDefault(x => x.ItemId == item.ItemId);
             if (existItem != null && string.IsNullOrEmpty(item.ItemNote))
             {
                 existItem.Quantity += item.Quantity;
@@ -33,11 +55,14 @@ namespace ODA.Data
             }
             else
                 Cart.Add(item);
+
+            //Push Update
+            await PushShoppingCartAsync(Cart);
         }
-        public void AddItem(Item item, int Quantity = 1)
+
+
+        public Task AddItemAsync(Item item, int Quantity = 1)
         {
-            if (Quantity < 1)
-                return;
             //Proceeed
             OrderItem newItem = new OrderItem
             {
@@ -48,73 +73,96 @@ namespace ODA.Data
                 ItemName = item.ItemName,
                 TotalCost = item.SellingPrice * Quantity
             };
-            AddItem(newItem);
+            return AddItemAsync(newItem);
+        }
+        public async Task ReduceItemAsync(Item item)
+        {
+            List<OrderItem> Cart = await GetShoppingListAsync();
+            var existItem = Cart.FirstOrDefault(x => x.ItemId == item.ItemId);
+            if (existItem != null && string.IsNullOrEmpty(existItem.ItemNote))
+            {
+                //Check if Already Less or Equan to One
+                if (existItem.Quantity <= 1)
+                    Cart.Remove(existItem);
+                else
+                {
+                    existItem.Quantity = (existItem.Quantity - 1);
+                    existItem.Rate = item.SellingPrice;
+                    existItem.Tax = existItem.Tax * (existItem.Quantity - 1);
+                    existItem.TotalCost = item.SellingPrice * (existItem.Quantity - 1);
+                }
+            }
+            //Push Update
+            await PushShoppingCartAsync(Cart);
         }
 
-        public void RemoveItem(OrderItem item)
+        public async Task RemoveItem(OrderItem item)
         {
-            Cart.Remove(item);
+            List<OrderItem> Cart = await GetShoppingListAsync();
+            var existItem = Cart.FirstOrDefault(x => x.ItemId == item.ItemId);
+            if (existItem != null)
+                Cart.Remove(existItem);
+            //Push Update
+            await PushShoppingCartAsync(Cart);
         }
 
-        public double GetTotalDue()
+        public async Task<double> GetTotalDueAsync()
         {
+            List<OrderItem> Cart = await GetShoppingListAsync();
             return Cart.Sum(x => x.TotalCost);
         }
-        public double GetSubTotal()
+        public async Task<double> GetSubTotal()
         {
-            return GetTotalDue() - GetTotalTax();
+            var totalDue = await GetTotalDueAsync();
+            var totalTax = await GetTotalTaxAsync();
+            return totalDue - totalTax;
         }
 
-        public double GetTotalDiscount()
+        public async Task<double> GetTotalDiscount()
         {
+            List<OrderItem> Cart = await GetShoppingListAsync();
             return Cart.Sum(x => x.Discount);
         }
 
-        public double GetTotalTax()
+        public async Task<double> GetTotalTaxAsync()
         {
+            List<OrderItem> Cart = await GetShoppingListAsync();
             return Cart.Sum(x => x.Tax);
         }
 
-        public int GetTotalItems()
+        public async Task<int> GetTotalItemsAsync()
         {
+            List<OrderItem> Cart = await GetShoppingListAsync();
             return Cart.Sum(x => x.Quantity);
         }
 
-        public bool VerifyCanCheckout()
+        public async Task<string> VerifyCanCheckoutMessage()
         {
-            if (GetTotalItems() < 1)
-                throw new Exception("No Items added In Shopping Cart");
-            foreach (var item in GetShoppingList())
+            var totalItems = await GetTotalItemsAsync();
+            if (totalItems < 1)
+                return ("No Items added In Shopping Cart");
+            //Verify Item
+            List<OrderItem> allItems = await GetShoppingListAsync();
+            foreach (var item in allItems)
             {
                 if (item.Quantity < 1)
-                    throw new Exception($"Quantity of {item.ItemName} can not be less than 1");
+                    return ($"Quantity of {item.ItemName} can not be less than 1");
                 if (item.Rate < 0)
-                    throw new Exception($"Rate of {item.ItemName} can not be less than 0");
+                    return ($"Rate of {item.ItemName} can not be less than 0");
             }
             //If All Tests passed
-            return true;
+            return null;
         }
 
-        public OrderItem GetCartItemByItemId(int? itemId)
-        {
-            return Cart.FirstOrDefault(x => x.ItemId == itemId);
-        }
 
-        public OrderItem GetCartItemByBarcode(string ItemBarcode)
+        public async Task RemoveItemByItemId(int itemId)
         {
-            return Cart.FirstOrDefault(x => x.ItemBarcode == ItemBarcode);
-        }
-
-        public void EmptyShoppingCart()
-        {
-            Cart = new List<OrderItem>();
-        }
-
-        public void RemoveItemByItemId(int itemId)
-        {
-            var itemFound = GetCartItemByItemId(itemId);
-            if (itemFound != null)
-                RemoveItem(itemFound);
+            List<OrderItem> Cart = await GetShoppingListAsync();
+            var existItem = Cart.FirstOrDefault(x => x.ItemId == itemId);
+            if (existItem != null && string.IsNullOrEmpty(existItem.ItemNote))
+                Cart.Remove(existItem);
+            //Push Update
+            await PushShoppingCartAsync(Cart);
         }
 
 

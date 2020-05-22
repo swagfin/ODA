@@ -3,11 +3,11 @@ using System.Threading.Tasks;
 
 namespace ODA.Services.Implementations
 {
-    public class SessionStorageService : ISessionStorageService
+    public class CustomSessionStorageService : ICustomSessionStorageService
     {
         private IJSRuntime js { get; set; }
 
-        public SessionStorageService(IJSRuntime runtime)
+        public CustomSessionStorageService(IJSRuntime runtime)
         {
             js = runtime;
         }

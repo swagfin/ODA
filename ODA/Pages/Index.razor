@@ -1,28 +1,4 @@
 ﻿@page "/"
-<AuthorizeView>
-    <Authorized>
-        <p>The login I did</p>
-    </Authorized>
-    <NotAuthorized>
-        <p>The login I must do</p>
-    </NotAuthorized>
-</AuthorizeView>
-
-<AuthorizeView Roles="Administrator">
-    <p>Yes, me Admin</p>
-</AuthorizeView>
-
-<AuthorizeView Roles="Moderator">
-    <p>Yes, me Mod</p>
-</AuthorizeView>
-
-<AuthorizeView Roles="User">
-    <p>Oh no, me user</p>
-</AuthorizeView>
-
-<AuthorizeView Roles="Administrator, Moderator">
-    <p>Yes, we both nice</p>
-</AuthorizeView>
 <div>
     <div class="col-12 p-0" id="firstScreenMain" style="height: 901px;">
         <div class="block m-0 ">
@@ -32,8 +8,23 @@
             <div class="block-content pt-10">
                 <div class="block-content p-0" style="text-align:center"><img src="/assets/img/logos/logo.png" class="img-fluid" style="filter: none; width: 184px;"></div>
                 <h1 class="welcome-heading mt-10">Order from top &amp; favourite restaurants</h1>
-                <h2 class="welcome-subheading text-center mt-10 mb-10">Ready to see top restaurant to order?</h2><a class="btn btn-lg btn-setup-location" style="background-color: rgb(252, 128, 25); position: relative;" href="/setlocation">setup your location<canvas style="border-radius: inherit; height: 100%; left: 0px; position: absolute; top: 0px; width: 100%;" height="0" width="0"></canvas></a>
-                <p class="login-block mb-0">Have an account? <a style="color: rgb(252, 128, 25);" href="/login.html">Login</a></p>
+
+                <AuthorizeView>
+                    <Authorized>
+                        <h2 class="welcome-subheading text-center mt-10 mb-10">Hi, <span style="font-weight:bold">@context.User.Identity.Name</span>, Welcome Back</h2>
+                        <a class="btn btn-lg btn-setup-location" style="background-color: rgb(252, 128, 25); position: relative;" href="/setlocation">Proceed to Order</a>
+                        <p class="login-block mb-0">This is not you account account? <a style="color: rgb(252, 128, 25);" href="/login.html">Login</a></p>
+
+                    </Authorized>
+                    <NotAuthorized>
+                        <h2 class="welcome-subheading text-center mt-10 mb-10">Ready to see top restaurant to order?</h2>
+                        <a class="btn btn-lg btn-setup-location" style="background-color: rgb(252, 128, 25); position: relative;" href="/setlocation">setup your location</a>
+                        <p class="login-block mb-0">Have an account? <a style="color: rgb(252, 128, 25);" href="/login.html">Login</a></p>
+
+                    </NotAuthorized>
+                </AuthorizeView>
+
+
             </div>
         </div>
     </div>

@@ -1,0 +1,35 @@
+﻿<div class="col-12 p-0 fixed" style="z-index: 9;">
+    <div class="block m-0">
+        <div class="block-content p-0">
+            <div class="input-group search-box">
+                <div class="input-group-prepend">
+                    @if (string.IsNullOrEmpty(NavigationLink))
+                    {
+                        <button type="button" onclick="window.history.back();" class="btn search-navs-btns back-button" style="position: relative;">
+                            <i class="si si-arrow-left"></i>
+                        </button>
+                    }
+                    else
+                    {
+                        <button type="button" onclick='location.href="@(NavigationLink)"' class="btn search-navs-btns back-button" style="position: relative;">
+                            <i class="si si-arrow-left"></i>
+                        </button>
+                    }
+                </div>
+                <p class="form-control search-input"><span class="nav-page-title">@NavLabel</span></p>
+                <div class="input-group-append"></div>
+            </div>
+        </div>
+    </div>
+</div>
+@ChildContent
+@code{
+
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public string NavLabel { get; set; } = string.Empty;
+    [Parameter]
+    public string NavigationLink { get; set; } = "/";
+
+}

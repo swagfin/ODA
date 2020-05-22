@@ -29,12 +29,8 @@
 @code {
     private string SearchAs { get; set; }
 
-    IEnumerable<MapPopularPlace>
-    mapPlaces
-    { get; set; }
-    IEnumerable<MapPopularPlace>
-        foundResults
-    { get; set; }
+    IEnumerable<MapPopularPlace> mapPlaces { get; set; }
+    IEnumerable<MapPopularPlace> foundResults  { get; set; }
 
     private void FindItem()
     {
@@ -49,10 +45,10 @@
         foundResults = mapPlaces;
     }
 
-    private void SetUserLocation(MapPopularPlace location)
+    private async void SetUserLocation(MapPopularPlace location)
     {
         //onclick = "location.href='/search/@item.Place';"
-        session.SetItemAsync(ODAConstants.userLocation.ToString(), location.Place);
+        await session.SetItemAsync(ODAConstants.userLocation.ToString(), location.Place);
         nav.NavigateTo("/search");
     }
 
