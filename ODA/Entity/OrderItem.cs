@@ -53,6 +53,8 @@ namespace ODA.Entity
         [StringLength(250)]
         public string TokenKey { get; set; } = Guid.NewGuid().ToString();
         public DateTime RegisteredDate { get; set; } = DateTime.Now;
+        public int? OrderRestaurantId { get; set; }
+        public double WaitTimeInMin { get; set; } = 1;
         public virtual Item Item { get; set; }
     }
 }

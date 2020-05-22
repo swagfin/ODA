@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ODA.Context;
 
 namespace ODA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200522140210_Modified Order Item")]
+    partial class ModifiedOrderItem
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -303,9 +305,6 @@ namespace ODA.Migrations
                         .HasMaxLength(250);
 
                     b.Property<double>("TotalCost")
-                        .HasColumnType("float");
-
-                    b.Property<double>("WaitTimeInMin")
                         .HasColumnType("float");
 
                     b.HasKey("Id");

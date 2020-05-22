@@ -16,6 +16,7 @@ namespace ODA.Data
         Task<int> GetTotalItemsAsync();
         Task<double> GetTotalTaxAsync();
         Task ReduceItemAsync(Item item);
+        Task ReduceItemAsync(OrderItem item);
         Task RemoveItem(OrderItem item);
         Task RemoveItemByItemId(int itemId);
         Task<string> VerifyCanCheckoutMessage();

@@ -37,6 +37,13 @@
     //During Update
     protected override async Task OnParametersSetAsync()
     {
-        CartItems = await ShoppingCart.GetTotalItemsAsync();
+        try
+        {
+            CartItems = await ShoppingCart.GetTotalItemsAsync();
+        }
+        catch (Exception)
+        {
+
+        }
     }
 }

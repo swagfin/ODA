@@ -1,38 +1,65 @@
 ﻿@page "/login"
-<div class="container">
-
-    <div class="row justify-content-md-center">
-        <div class="col-md-auto">
-
-            <EditForm OnValidSubmit="LoginUserRequest" Model="User">
-                <DataAnnotationsValidator />
-                <div class="form-group">
-                    <InputText placeholder="Email-Adresse" @bind-Value="User.EmailAddress" class="form-control" />
-                    <ValidationMessage For="@(() => User.EmailAddress)" />
-                </div>
-
-                <div class="form-group">
-                    <InputText type="password" placeholder="Passwort" @bind-Value="User.Password" class="form-control" />
-                    <ValidationMessage For="@(() => User.Password)" />
-                </div>
-
-                <button class="button-block">Login</button>
-            </EditForm>
-
+@page "/login/redirect/{RedirectUrl}"
+<div style="background-color: rgb(242, 244, 249);">
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <button type="button" onclick="window.history.back();" class="btn search-navs-btns back-button" style="position: relative;">
+                <i class="si si-arrow-left"></i>
+            </button>
         </div>
+    </div><img src="/assets/img/login-header.png" class="login-image pull-right mr-15" alt="login-header">
+    <div class="login-texts px-15 mt-50 pb-20">
+        <span class="login-title">LOGIN</span>
+        <br><span class="login-subtitle">Enter your email and password</span>
     </div>
-
 </div>
+<div class="bg-white">
 
+    <EditForm OnValidSubmit="LoginUserRequest" Model="User">
+        <DataAnnotationsValidator />
+        <div class="form-group px-15 pt-30">
+
+            <label class="col-12 edit-address-input-label">Email </label>
+
+            <div class="col-md-9 pb-5">
+                <InputText placeholder="Email-Adresse" @bind-Value="User.EmailAddress" name="email" class="form-control edit-address-input" />
+                <ValidationMessage For="@(() => User.EmailAddress)" />
+            </div>
+
+            <label class="col-12 edit-address-input-label">Password </label>
+
+            <div class="col-md-9">
+                <InputText type="password" placeholder="Passwort" @bind-Value="User.Password" name="password" class="form-control edit-address-input" />
+                <ValidationMessage For="@(() => User.Password)" />
+            </div>
+        </div>
+        <div class="mt-20 px-15 pt-15 button-block">
+            <button type="submit" class="btn btn-main" style="background-color: rgb(252, 128, 25);">LOGIN</button>
+        </div>
+    </EditForm>
+    <div class="text-center mt-50 mb-20">Don't have an account? <a style="color: rgb(252, 128, 25);" href="/register">Register</a></div>
+</div>
 @code {
 
     private User User { get; set; } = new User();
-
+    [Parameter]
+    public string RedirectUrl { get; set; }
     private async Task LoginUserRequest()
     {
         // validate user
+        try
+        {
+            await ServiceProvider.Get<ODAAuthStateProvider>().LoginAsync(User);
+            //Check Redirection
+            if (string.IsNullOrWhiteSpace(RedirectUrl))
+                nav.NavigateTo("/");
+            else
+                nav.NavigateTo(string.Format("/{0}", RedirectUrl));
+        }
+        catch (Exception)
+        {
 
-        await ServiceProvider.Get<ODAAuthStateProvider>().LoginAsync(User);
-        nav.NavigateTo("/");
+        }
+
     }
 }

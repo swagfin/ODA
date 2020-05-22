@@ -176,14 +176,22 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        //Get Restaurant By Id
-        Model = await InjectedService.GetAsync(RestaurantId);
-        if (Model == null)
+        try
         {
-            nav.NavigateTo("/search");
-            return;
-        }
 
+            //Get Restaurant By Id
+            Model = await InjectedService.GetAsync(RestaurantId);
+            if (Model == null)
+            {
+                nav.NavigateTo("/search");
+                return;
+            }
+
+        }
+        catch (Exception)
+        {
+
+        }
     }
 
 

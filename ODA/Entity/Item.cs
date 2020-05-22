@@ -19,7 +19,7 @@ namespace ODA.Entity
 
         [StringLength(255)]
         public string MoreInfo { get; set; }
-        public Double WaitTimeInMin { get; set; } = 5;
+        public double WaitTimeInMin { get; set; } = 5;
         [Range(0, 999999999)]
         public int OrderedQuantity { get; set; } = 0;
         [Range(0, 999999999)]

@@ -32,7 +32,14 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        Cart = await ShoppingCart.GetShoppingListAsync();
+        try
+        {
+            Cart = await ShoppingCart.GetShoppingListAsync();
+        }
+        catch (Exception)
+        {
+
+        }
     }
 
 }

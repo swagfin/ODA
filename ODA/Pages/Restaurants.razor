@@ -67,18 +67,26 @@
 
     protected async override Task OnInitializedAsync()
     {
-        Location = await session.GetItemAsync<string>(ODAConstants.userLocation.ToString());
-        if (string.IsNullOrWhiteSpace(Location))
+        try
         {
-            //Check if User is Authenticated
-            nav.NavigateTo("/setlocation");
-            return;
-        }
-        AllItems = await injectedService.GetAllByLocationAsync(Location);
-        //Trying to Filter using Search Parameter
-        if (!string.IsNullOrWhiteSpace(SearchItem))
-            AllItems = AllItems.Where(x => x.Category != null && x.Category.ToLower().Contains(SearchItem.ToLower())).ToList();
 
-        TotalRestaurants = AllItems != null ? AllItems.Count() : 0;
+            Location = await session.GetItemAsync<string>(ODAConstants.userLocation.ToString());
+            if (string.IsNullOrWhiteSpace(Location))
+            {
+                //Check if User is Authenticated
+                nav.NavigateTo("/setlocation");
+                return;
+            }
+            AllItems = await injectedService.GetAllByLocationAsync(Location);
+            //Trying to Filter using Search Parameter
+            if (!string.IsNullOrWhiteSpace(SearchItem))
+                AllItems = AllItems.Where(x => x.Category != null && x.Category.ToLower().Contains(SearchItem.ToLower())).ToList();
+
+            TotalRestaurants = AllItems != null ? AllItems.Count() : 0;
+        }
+        catch (Exception)
+        {
+
+        }
     }
 }

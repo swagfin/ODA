@@ -59,6 +59,14 @@ body {
     background-color: #fff
 }
 
+/*
+    For Validation Messages
+*/
+.validation-message {
+    color: red;
+    font-weight:bold;
+}
+
  /*
   * For the LOADER
   */

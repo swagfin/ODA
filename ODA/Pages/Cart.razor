@@ -1,0 +1,171 @@
+﻿@page "/cart"
+@inject ICartService ShoppingCart
+
+<div>
+    <TopBackNavBar NavLabel="Cart" />
+
+    @if (TotalCartItems < 1)
+    {
+        <div class="bg-white cart-empty-block">
+            <img class="cart-empty-img" src="/assets/img/cart-empty.png" alt="Your Cart is Empty">
+            <h2 class="cart-empty-text mt-50 text-center">Your Cart is Empty</h2><p></p>
+        </div>
+        <BottomNavMenu />
+    }
+    else
+    {
+        <div>
+
+            <div class="bg-white">
+                <div class="bg-light pb-10" style="padding-top: 5rem;">
+                    <div class="block-content block-content-full pt-2"><img src="/assets/img/foods/choma-bite.jpg" alt="Wing Machine - College" class="restaurant-image mt-0"></div>
+                    <div class="block-content block-content-full restaurant-info">
+                        <h4 class="font-w600 mb-5 text-dark">Order To: Jimmy's Choma Bite Hotel</h4>
+                        <div class="font-size-sm text-muted truncate-text text-muted">Kuku Choma, Fry, Beaf</div>
+                        <div class="text-center restaurant-meta mt-5 d-flex align-items-center justify-content-between text-muted">
+                            <div class="col-2 p-0 text-left"><i class="fa fa-star" style="color: rgb(252, 128, 25);"></i> 4.7</div>
+                            <div class="col-4 p-0 text-center"><i class="si si-clock"></i> 15 MINS</div>
+                            <div class="col-6 p-0 text-center"><i class="si si-wallet"></i> $$</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="block-content block-content-full bg-white pt-10 pb-5">
+                <h2 class="item-text mb-10">Jimmy's Choma Bite Hotel's Order</h2>
+                @foreach (var item in CartItems)
+                {
+
+                    <div class="cart-item-meta pt-15 pb-15 align-items-center">
+                        <div class="cart-item-name">@item.ItemName</div>
+                        <div class="btn-group btn-group-sm cart-item-btn">
+                            <button type="button" @onclick="@(()=>ReduceItem(item))" class="btn btn-add-remove">
+                                <span class="btn-dec">-</span>
+                            </button>
+                            <button type="button" class="btn btn-quantity">@item.Quantity</button>
+                            <button type="button" @onclick="@(()=>AddItem(item))" class="btn btn-add-remove">
+                                <span class="btn-inc">+</span>
+                            </button>
+                        </div>
+                        <div class="cart-item-price">@string.Format("Ksh. {0:N2}", item.TotalCost)</div>
+                    </div>
+
+                }
+
+            </div>
+
+            <input class="form-control order-comment mb-20" type="text" placeholder="Write your comment/suggestion for the restaurant..." value="">
+        </div>
+
+
+        <div>
+            <div class="bg-white bill-details mb-200">
+                <div class="p-15">
+                    <h2 class="bill-detail-text m-0">Bill Details</h2>
+                    <div class="display-flex">
+                        <div class="flex-auto">Item Total</div>
+                        <div class="flex-auto text-right">@string.Format("Ksh. {0:N2}", TotalCartItemsCost)</div>
+                    </div>
+                    <div class="display-flex">
+                        <div class="flex-auto">Restaurant Charges</div>
+                        <div class="flex-auto text-right">Ksh. 0.00</div>
+                    </div>
+
+                    <hr>
+                    <div class="display-flex">
+                        <div class="flex-auto font-w700">To Pay</div>
+                        <div class="flex-auto text-right font-w700">@string.Format("Ksh. {0:N2}", TotalCartItemsCost)</div>
+                    </div>
+                    <p class="my-2 mt-3 text-danger font-weight-bold">WAITING TIME: @(WaitingTime).</p>
+                </div>
+            </div>
+        </div>
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="bg-white cart-checkout-block" style="height: 22vh;">
+                    <div class="p-15">
+                        <h2 class="almost-there-text m-0 pb-5">Jimmy's Choma Bite Hotel's Order</h2>
+                        <span class="almost-there-sub text-muted">Your Order will be placed to the above Restaurant</span>
+                        <a class="btn btn-lg btn-continue" style="background-color: rgb(96, 178, 70); color: rgb(255, 255, 255); position: relative;" href="/checkout">Proceed to Checkout</a>
+                    </div>
+                </div>
+
+            </Authorized>
+            <NotAuthorized>
+                <div class="bg-white cart-checkout-block" style="height: 22vh;">
+                    <div class="p-15">
+                        <h2 class="almost-there-text m-0 pb-5">Almost There</h2>
+                        <span class="almost-there-sub text-muted">Login or Signup to place your order</span>
+                        <a class="btn btn-lg btn-continue" style="background-color: rgb(252, 128, 25); position: relative;" href="/login/redirect/Cart">Continue</a>
+                    </div>
+                </div>
+            </NotAuthorized>
+        </AuthorizeView>
+
+
+    }
+</div>
+
+
+@code{
+    public List<OrderItem> CartItems { get; set; } = new List<OrderItem>();
+    private int TotalCartItems
+    {
+        get
+        {
+            if (CartItems == null)
+                return 0;
+            return CartItems.Sum(x => x.Quantity);
+        }
+    }
+    private double TotalCartItemsCost
+    {
+        get
+        {
+            if (CartItems == null)
+                return 0;
+            return CartItems.Sum(x => x.TotalCost);
+        }
+    }
+    private string WaitingTime
+    {
+        get
+        {
+            if (CartItems == null)
+                return null;
+            double waitTotal = CartItems.Sum(x => x.WaitTimeInMin * x.Quantity);
+            return TimeElapse.Format(DateTime.Now.AddMinutes(waitTotal));
+        }
+    }
+
+    public async Task AddItem(OrderItem item)
+    {
+        await ShoppingCart.AddItemAsync(item);
+        await ReloadCart();
+    }
+    public async Task ReduceItem(OrderItem item)
+    {
+        await ShoppingCart.ReduceItemAsync(item);
+        await ReloadCart();
+    }
+
+    private async Task ReloadCart()
+    {
+        try
+        {
+            CartItems = await ShoppingCart.GetShoppingListAsync();
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ReloadCart();
+    }
+
+
+}

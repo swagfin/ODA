@@ -60,15 +60,23 @@ else
 
     protected override async Task OnInitializedAsync()
     {
-        //Get Current Location
-        Location = await session.GetItemAsync<string>(ODAConstants.userLocation.ToString());
-        if (string.IsNullOrWhiteSpace(Location))
+        try
         {
-            nav.NavigateTo("/setlocation");
-            return;
+
+            //Get Current Location
+            Location = await session.GetItemAsync<string>(ODAConstants.userLocation.ToString());
+            if (string.IsNullOrWhiteSpace(Location))
+            {
+                nav.NavigateTo("/setlocation");
+                return;
+            }
+            itemCategories = await injectService.GetAllAsync();
+            foundResults = itemCategories;
         }
-        itemCategories = await injectService.GetAllAsync();
-        foundResults = itemCategories;
+        catch (Exception)
+        {
+
+        }
     }
 
 }

@@ -45,10 +45,15 @@ namespace ODA.Data
         public async Task AddItemAsync(OrderItem item)
         {
             List<OrderItem> Cart = await GetShoppingListAsync();
+            //Check Item Being Added is of Another Restaurant
+            //Clear If its from another Restaurant
+            if (Cart != null && Cart.FirstOrDefault(x => x.OrderRestaurantId == item.OrderRestaurantId) == null)
+                Cart = new List<OrderItem>();
+            //Proceed
             var existItem = Cart.FirstOrDefault(x => x.ItemId == item.ItemId);
             if (existItem != null && string.IsNullOrEmpty(item.ItemNote))
             {
-                existItem.Quantity += item.Quantity;
+                existItem.Quantity += 1;
                 existItem.Rate = item.Rate;
                 existItem.Tax = item.Tax * existItem.Quantity;
                 existItem.TotalCost = item.Rate * existItem.Quantity;
@@ -60,12 +65,34 @@ namespace ODA.Data
             await PushShoppingCartAsync(Cart);
         }
 
+        public async Task ReduceItemAsync(OrderItem item)
+        {
+            List<OrderItem> Cart = await GetShoppingListAsync();
+            var existItem = Cart.FirstOrDefault(x => x.ItemId == item.ItemId);
+            if (existItem != null && string.IsNullOrEmpty(existItem.ItemNote))
+            {
+                //Check if Already Less or Equan to One
+                if (existItem.Quantity <= 1)
+                    Cart.Remove(existItem);
+                else
+                {
+                    existItem.Quantity = (existItem.Quantity - 1);
+                    existItem.Rate = item.Rate;
+                    existItem.Tax = existItem.Tax * (existItem.Quantity - 1);
+                    existItem.TotalCost = item.Rate * (existItem.Quantity - 1);
+                }
+            }
+            //Push Update
+            await PushShoppingCartAsync(Cart);
+        }
 
         public Task AddItemAsync(Item item, int Quantity = 1)
         {
             //Proceeed
             OrderItem newItem = new OrderItem
             {
+                OrderRestaurantId = item.RestaurantId,
+                WaitTimeInMin = item.WaitTimeInMin,
                 ItemBarcode = item.ItemBarcode,
                 ItemId = item.ItemId,
                 Quantity = Quantity,
@@ -95,6 +122,7 @@ namespace ODA.Data
             //Push Update
             await PushShoppingCartAsync(Cart);
         }
+
 
         public async Task RemoveItem(OrderItem item)
         {

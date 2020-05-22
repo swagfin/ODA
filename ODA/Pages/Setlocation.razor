@@ -30,19 +30,12 @@
     private string SearchAs { get; set; }
 
     IEnumerable<MapPopularPlace> mapPlaces { get; set; }
-    IEnumerable<MapPopularPlace> foundResults  { get; set; }
+    IEnumerable<MapPopularPlace> foundResults { get; set; }
 
     private void FindItem()
     {
         if (!string.IsNullOrWhiteSpace(SearchAs) && mapPlaces != null)
             foundResults = mapPlaces.Where(x => x.Place.ToLower().Contains(SearchAs.ToLower()));
-    }
-
-
-    protected override async Task OnInitializedAsync()
-    {
-        mapPlaces = await injectService.GetAllAsync();
-        foundResults = mapPlaces;
     }
 
     private async void SetUserLocation(MapPopularPlace location)
@@ -51,5 +44,19 @@
         await session.SetItemAsync(ODAConstants.userLocation.ToString(), location.Place);
         nav.NavigateTo("/search");
     }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            mapPlaces = await injectService.GetAllAsync();
+            foundResults = mapPlaces;
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
 
 }
