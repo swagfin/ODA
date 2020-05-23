@@ -1,5 +1,6 @@
 ﻿using Blazored.SessionStorage;
 using Microsoft.JSInterop;
+using Newtonsoft.Json;
 using ODA.Entity;
 using System;
 using System.Collections.Generic;
@@ -7,24 +8,46 @@ using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 
-namespace ODA.Data
+namespace ODA.Services.Implementations
 {
-    public class CartService : ICartService
+    public class JSCartService : ICartService
     {
         private ISessionStorageService StorageService { get; }
-        public CartService(ISessionStorageService storage)
+        public IEncryptionAlgorithimService EncryptService { get; }
+        private string USER_CART_ENCRYPTION_KEY { get; }
+        public JSCartService(ISessionStorageService storage, IEncryptionAlgorithimService encryptionAlgorithim)
         {
             StorageService = storage;
+            EncryptService = encryptionAlgorithim;
+            //Hard Coded the Encrption Key
+            USER_CART_ENCRYPTION_KEY = "1a0c4decd2a5197062c2e9d6f6f0be2B";
         }
 
         public async Task<List<OrderItem>> GetShoppingListAsync()
         {
-            List<OrderItem> cart = await StorageService.GetItemAsync<List<OrderItem>>(ODAConstants.shoppingCart.ToString());
-            if (cart == null)
+            List<OrderItem> cart = null;
+            try
             {
-                cart = new List<OrderItem>();
+                //Handle Exception
+                string cartEncrypted = await StorageService.GetItemAsync<string>(ODAConstants.shoppingCart.ToString());
+                if (!string.IsNullOrWhiteSpace(cartEncrypted))
+                {
+                    //Proceed by Decrpting if string has somthing
+                    string cartDecrypted = EncryptService.Decrypt(cartEncrypted, USER_CART_ENCRYPTION_KEY);
+                    cart = JsonConvert.DeserializeObject<List<OrderItem>>(cartDecrypted);
+                }
+                //Proceed
+                if (cart == null)
+                {
+                    cart = new List<OrderItem>();
+                    await EmptyShoppingCartAsync();
+                }
+            }
+            catch (Exception)
+            {
                 await EmptyShoppingCartAsync();
             }
+
             return await Task.FromResult(cart);
         }
 
@@ -33,11 +56,16 @@ namespace ODA.Data
         {
             if (cart == null)
                 cart = new List<OrderItem>();
-            return StorageService.SetItemAsync(ODAConstants.shoppingCart.ToString(), cart);
+            //Serialize to string
+            string cartString = JsonConvert.SerializeObject(cart);
+            //Encrypt string
+            string encryptedCart = EncryptService.Encrypt(cartString, this.USER_CART_ENCRYPTION_KEY);
+            //Save thate storage
+            return StorageService.SetItemAsync(ODAConstants.shoppingCart.ToString(), encryptedCart);
         }
         public Task EmptyShoppingCartAsync()
         {
-            return StorageService.SetItemAsync(ODAConstants.shoppingCart.ToString(), new List<OrderItem>());
+            return PushShoppingCartAsync(new List<OrderItem>());
         }
 
 

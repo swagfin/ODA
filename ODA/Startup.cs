@@ -8,7 +8,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ODA.Auth;
 using ODA.Context;
-using ODA.Data;
 using ODA.Services;
 using ODA.Services.Implementations;
 
@@ -16,12 +15,12 @@ namespace ODA
 {
     public class Startup
     {
+        public IConfiguration Configuration { get; }
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
         }
 
-        public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
@@ -32,14 +31,14 @@ namespace ODA
             services.AddRazorPages();
             services.AddServerSideBlazor();
             // services.AddStorage();
-            services.AddAuthorization();
             services.AddAuthentication();
+            services.AddAuthorization();
             services.AddBlazoredSessionStorage();
             // services.AddSingleton<UserSessionStorage>();
             services.AddScoped<AuthenticationStateProvider, ODAAuthStateProvider>();
             //Used By AuthenticationStateProvider
             services.AddScoped<IEncryptionAlgorithimService, EncryptionAlgorithimService>();
-            services.AddScoped<ICartService, CartService>();
+            services.AddScoped<ICartService, JSCartService>();
             services.AddScoped<IItemCategoryService, ItemCategoryService>();
             services.AddScoped<IItemService, ItemService>();
             services.AddScoped<IMapPopularPlaceService, MapPopularPlaceService>();
@@ -67,7 +66,6 @@ namespace ODA
 
             app.UseEndpoints(endpoints =>
             {
-                //Remove Prerendering
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });

@@ -49,6 +49,7 @@
         // validate user
         try
         {
+            //Becuase we Want to Use THE lOGIN Function ONLY AVAILABLE IN the Implementation
             await ServiceProvider.Get<ODAAuthStateProvider>().LoginAsync(User);
             //Check Redirection
             if (string.IsNullOrWhiteSpace(RedirectUrl))
@@ -58,6 +59,7 @@
         }
         catch (Exception)
         {
+            nav.NavigateTo("/");
 
         }
 

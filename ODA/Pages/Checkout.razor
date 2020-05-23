@@ -1,0 +1,56 @@
+﻿@page "/Checkout"
+@inject ICartService ShoppingCart
+
+<TopBackNavBar NavLabel="Checkout" NavigationLink="/Cart" />
+<div class="pt-50">
+    <div class="pt-30"></div>
+    <div class="col-12 mb-50">
+        <div class="text-center">
+            <h3 class="btn btn-lg btn-outline-secondary btn-square d-block bg-white" style="border-color: rgb(238, 238, 238);">
+                To Pay <span style="color: rgb(252, 128, 25);">@string.Format("Ksh. {0:N2}", AmountToPay)</span>
+            </h3>
+        </div>
+        <div class="row">
+            <hr>
+            <div class="col-12 text-center mb-0 mt-4">
+                <h4 class="text-muted">Select your prefered payment method</h4>
+            </div>
+
+            <a class="col-12 paymentGatewayBlock" href="?paying">
+                <div class="block block-link-shadow text-left shadow-light">
+                    <div class="block-content block-content-full clearfix py-3 payment-select-block">
+                        <div class="float-right mt-10"><img src="/assets/img/mpesa.png" alt="MPESA" class="img-fluid"></div>
+                        <div class="font-size-h3 font-w600">MPESA</div>
+                        <div class="font-size-sm font-w600 text-muted">Mpesa Buy Goods &amp; Services</div>
+                    </div>
+                </div>
+            </a>
+        </div>
+    </div>
+
+
+</div>
+
+@code{
+
+    private double AmountToPay { get; set; } = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            double totalItems = await ShoppingCart.GetTotalItemsAsync();
+            if (totalItems < 1)
+            {
+                nav.NavigateTo("/Cart");
+                return;
+            }
+            AmountToPay = await ShoppingCart.GetTotalDueAsync();
+        }
+        catch (Exception)
+        {
+            nav.NavigateTo("/Cart");
+        }
+    }
+
+}
