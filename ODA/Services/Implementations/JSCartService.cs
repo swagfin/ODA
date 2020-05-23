@@ -1,4 +1,5 @@
 ﻿using Blazored.SessionStorage;
+using Microsoft.Extensions.Configuration;
 using Microsoft.JSInterop;
 using Newtonsoft.Json;
 using ODA.Entity;
@@ -15,12 +16,11 @@ namespace ODA.Services.Implementations
         private ISessionStorageService StorageService { get; }
         public IEncryptionAlgorithimService EncryptService { get; }
         private string USER_CART_ENCRYPTION_KEY { get; }
-        public JSCartService(ISessionStorageService storage, IEncryptionAlgorithimService encryptionAlgorithim)
+        public JSCartService(IConfiguration configuration, ISessionStorageService storage, IEncryptionAlgorithimService encryptionAlgorithim)
         {
             StorageService = storage;
             EncryptService = encryptionAlgorithim;
-            //Hard Coded the Encrption Key
-            USER_CART_ENCRYPTION_KEY = "1a0c4decd2a5197062c2e9d6f6f0be2B";
+            USER_CART_ENCRYPTION_KEY = configuration["EncryptionKeys:CartKey"];
         }
 
         public async Task<List<OrderItem>> GetShoppingListAsync()

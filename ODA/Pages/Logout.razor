@@ -1,0 +1,18 @@
+﻿@page "/Logout"
+@page "/Logout/{RedirectUrl}"
+<p>Terminating session...</p>
+@code{
+    [Parameter]
+    public string RedirectUrl { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        //Becuase we Want to Use THE lOGIN Function ONLY AVAILABLE IN the Implementation
+        await ServiceProvider.Get<ODAAuthStateProvider>().LogoutAsync();
+        //Check Redirection
+        if (string.IsNullOrWhiteSpace(RedirectUrl))
+            nav.NavigateTo("/Login");
+        else
+            nav.NavigateTo(string.Format("/{0}", RedirectUrl));
+    }
+
+}

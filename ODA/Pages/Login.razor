@@ -1,5 +1,7 @@
 ﻿@page "/login"
 @page "/login/redirect/{RedirectUrl}"
+@inject ICustomerService customerService
+
 <div style="background-color: rgb(242, 244, 249);">
     <div class="input-group">
         <div class="input-group-prepend">
@@ -22,14 +24,14 @@
             <label class="col-12 edit-address-input-label">Email </label>
 
             <div class="col-md-9 pb-5">
-                <InputText placeholder="Email-Adresse" @bind-Value="User.EmailAddress" name="email" class="form-control edit-address-input" />
+                <InputText placeholder="Email or Phone" @bind-Value="User.EmailAddress" auto-complete="off" class="form-control edit-address-input" />
                 <ValidationMessage For="@(() => User.EmailAddress)" />
             </div>
 
             <label class="col-12 edit-address-input-label">Password </label>
 
             <div class="col-md-9">
-                <InputText type="password" placeholder="Passwort" @bind-Value="User.Password" name="password" class="form-control edit-address-input" />
+                <InputText type="password" placeholder="Password" @bind-Value="User.Password" auto-complete="off" class="form-control edit-address-input" />
                 <ValidationMessage For="@(() => User.Password)" />
             </div>
         </div>
@@ -37,30 +39,58 @@
             <button type="submit" class="btn btn-main" style="background-color: rgb(252, 128, 25);">LOGIN</button>
         </div>
     </EditForm>
-    <div class="text-center mt-50 mb-20">Don't have an account? <a style="color: rgb(252, 128, 25);" href="/register">Register</a></div>
+    <div class="text-center mt-50 mb-20">Don't have an account? <a style="color: rgb(252, 128, 25);" href="/register@(string.IsNullOrWhiteSpace(RedirectUrl)==false ? $"/redirect/{RedirectUrl}": "")">Register</a></div>
 </div>
+
+@if (!string.IsNullOrWhiteSpace(NotificationMessage))
+{
+    <Notification Message="@NotificationMessage" />
+}
 @code {
 
-    private User User { get; set; } = new User();
+    private LoginViewModel User { get; set; } = new LoginViewModel();
     [Parameter]
     public string RedirectUrl { get; set; }
+    public string NotificationMessage { get; set; }
     private async Task LoginUserRequest()
     {
         // validate user
         try
         {
-            //Becuase we Want to Use THE lOGIN Function ONLY AVAILABLE IN the Implementation
-            await ServiceProvider.Get<ODAAuthStateProvider>().LoginAsync(User);
-            //Check Redirection
-            if (string.IsNullOrWhiteSpace(RedirectUrl))
-                nav.NavigateTo("/");
+            NotificationMessage = null;
+            //Verify Account
+            Customer confirmedUser = await customerService.VerifyCredentialsAsync(User.EmailAddress, User.Password);
+            if (confirmedUser == null)
+            {
+                NotificationMessage = "Invalid Username or Password Provided";
+                User.Password = string.Empty;
+            }
             else
-                nav.NavigateTo(string.Format("/{0}", RedirectUrl));
+            {
+                //Create an Identity User
+                AuthenticatedUser newAuthUser = new AuthenticatedUser
+                {
+                    Id = confirmedUser.Id,
+                    EmailAddress = confirmedUser.EmailAddress,
+                    FullName = confirmedUser.FullName,
+                    IsAccountConfirmed = confirmedUser.IsAccountConfirmed,
+                    Location = confirmedUser.Location,
+                    PhoneNumber = confirmedUser.PhoneNumber
+                };
+
+                //Becuase we Want to Use THE lOGIN Function ONLY AVAILABLE IN the Implementation
+                await ServiceProvider.Get<ODAAuthStateProvider>().LoginAsync(newAuthUser);
+                //Check Redirection
+                if (string.IsNullOrWhiteSpace(RedirectUrl))
+                    nav.NavigateTo("/");
+                else
+                    nav.NavigateTo(string.Format("/{0}", RedirectUrl));
+            }
+
         }
         catch (Exception)
         {
-            nav.NavigateTo("/");
-
+            NotificationMessage = "Oops Unable to Authenticate User. Please Try Again Later";
         }
 
     }

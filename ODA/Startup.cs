@@ -8,6 +8,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ODA.Auth;
 using ODA.Context;
+using ODA.Entity;
 using ODA.Services;
 using ODA.Services.Implementations;
 
@@ -39,6 +40,7 @@ namespace ODA
             //Used By AuthenticationStateProvider
             services.AddScoped<IEncryptionAlgorithimService, EncryptionAlgorithimService>();
             services.AddScoped<ICartService, JSCartService>();
+            services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IItemCategoryService, ItemCategoryService>();
             services.AddScoped<IItemService, ItemService>();
             services.AddScoped<IMapPopularPlaceService, MapPopularPlaceService>();

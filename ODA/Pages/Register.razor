@@ -1,0 +1,119 @@
+﻿@page "/Register"
+@page "/Register/redirect/{RedirectUrl}"
+@inject ICustomerService customerService
+
+<div style="background-color: rgb(242, 244, 249);">
+    <div class="input-group">
+        <div class="input-group-prepend">
+            <button type="button" onclick="window.history.back();" class="btn search-navs-btns back-button" style="position: relative;">
+                <i class="si si-arrow-left"></i>
+            </button>
+        </div>
+    </div><img src="/assets/img/login-header.png" class="login-image pull-right mr-15" alt="Register">
+    <div class="login-texts px-15 mt-50 pb-20">
+        <span class="login-title">REGISTER</span>
+        <br><span class="login-subtitle">Register now for free</span>
+    </div>
+</div>
+<div class="bg-white">
+
+    <EditForm OnValidSubmit="RegisterRequest" Model="User">
+        <DataAnnotationsValidator />
+        <div class="form-group px-15 pt-30">
+
+            <label class="col-12 edit-address-input-label">Name </label>
+            <div class="col-md-9 pb-5">
+                <InputText placeholder="Full Name" @bind-Value="User.FullName" auto-complete="off" class="form-control edit-address-input" />
+                <ValidationMessage For="@(() => User.FullName)" />
+            </div>
+
+            <label class="col-12 edit-address-input-label">Email </label>
+            <div class="col-md-9 pb-5">
+                <InputText placeholder="Email-Address" type="email" @bind-Value="User.EmailAddress" auto-complete="off" class="form-control edit-address-input" />
+                <ValidationMessage For="@(() => User.EmailAddress)" />
+            </div>
+
+            <label class="col-12 edit-address-input-label">Mobile Phone </label>
+            <div class="col-md-9 pb-5">
+                <InputText placeholder="Full Name" @bind-Value="User.PrimaryMobile" auto-complete="off" class="form-control edit-address-input" />
+                <ValidationMessage For="@(() => User.PrimaryMobile)" />
+            </div>
+
+            <label class="col-12 edit-address-input-label">Password </label>
+            <div class="col-md-9">
+                <InputText type="password" placeholder="Passwort" @bind-Value="User.Password" auto-complete="off" class="form-control edit-address-input" />
+                <ValidationMessage For="@(() => User.Password)" />
+            </div>
+
+        </div>
+        <div class="mt-20 px-15 pt-15 button-block">
+            <button type="submit" class="btn btn-main" style="background-color: rgb(252, 128, 25);">REGISTER</button>
+        </div>
+    </EditForm>
+    <div class="text-center mt-50 mb-20">Already have an account? <a style="color: rgb(252, 128, 25);" href="/login@(string.IsNullOrWhiteSpace(RedirectUrl)==false ? $"/redirect/{RedirectUrl}": "")">Go to Login</a></div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(NotificationMessage))
+{
+    <Notification Message="@NotificationMessage" />
+}
+@code {
+
+    private RegisterViewModel User { get; set; } = new RegisterViewModel();
+    [Parameter]
+    public string RedirectUrl { get; set; }
+    public string NotificationMessage { get; set; }
+    private async Task RegisterRequest()
+    {
+        // validate user
+        try
+        {
+            NotificationMessage = null;
+
+            //Verify First If Customer Exists
+            bool accExist = await customerService.VerifyExistsAsync(User.PrimaryMobile, User.EmailAddress);
+            if (accExist)
+            {
+                NotificationMessage = "Oops, Email or Mobile Phone already registered, Try Again";
+                return;
+            }
+            //Create a New Customer
+            Customer customer = new Customer
+            {
+
+                EmailAddress = User.EmailAddress,
+                FullName = User.FullName,
+                Password = User.Password,
+                PhoneNumber = User.PrimaryMobile,
+            };
+            //Call Our Service and Add Customer
+            await customerService.AddAsync(customer);
+            //If Success
+            //Create an Identity User
+            AuthenticatedUser newAuthUser = new AuthenticatedUser
+            {
+                Id = customer.Id,
+                EmailAddress = customer.EmailAddress,
+                FullName = customer.FullName,
+                IsAccountConfirmed = customer.IsAccountConfirmed,
+                Location = customer.Location,
+                PhoneNumber = customer.PhoneNumber
+            };
+
+
+            //Becuase we Want to Use THE lOGIN Function ONLY AVAILABLE IN the Implementation
+            await ServiceProvider.Get<ODAAuthStateProvider>().LoginAsync(newAuthUser);
+            //Redirect Back
+            if (string.IsNullOrWhiteSpace(RedirectUrl))
+                nav.NavigateTo("/");
+            else
+                nav.NavigateTo(string.Format("/{0}", RedirectUrl));
+
+        }
+        catch (Exception)
+        {
+            NotificationMessage = "Oops Unable to Register Account. Please Try Again Later";
+        }
+
+    }
+}

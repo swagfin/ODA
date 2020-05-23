@@ -3,15 +3,17 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using ODA.Context;
 
 namespace ODA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20200523184402_UpdatedCustomer")]
+    partial class UpdatedCustomer
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -32,14 +34,10 @@ namespace ODA.Migrations
                     b.Property<double>("CompletedOrders")
                         .HasColumnType("float");
 
-                    b.Property<string>("EmailAddress")
-                        .HasColumnType("nvarchar(180)")
-                        .HasMaxLength(180);
-
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(220)")
-                        .HasMaxLength(220);
+                        .HasColumnType("nvarchar(50)")
+                        .HasMaxLength(50);
 
                     b.Property<bool>("IsAccountConfirmed")
                         .HasColumnType("bit");
@@ -51,12 +49,16 @@ namespace ODA.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("PhoneNumber")
-                        .HasColumnType("nvarchar(120)")
-                        .HasMaxLength(120);
-
                     b.Property<double>("PlacedOrders")
                         .HasColumnType("float");
+
+                    b.Property<string>("PrimaryEmail")
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
+
+                    b.Property<string>("PrimaryMobile")
+                        .HasColumnType("nvarchar(100)")
+                        .HasMaxLength(100);
 
                     b.Property<string>("TokenKey")
                         .HasColumnType("nvarchar(255)")
