@@ -40,6 +40,8 @@ namespace ODA
             //Used By AuthenticationStateProvider
             services.AddScoped<IEncryptionAlgorithimService, EncryptionAlgorithimService>();
             services.AddScoped<ICartService, JSCartService>();
+
+            services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<ICustomerService, CustomerService>();
             services.AddScoped<IItemCategoryService, ItemCategoryService>();
             services.AddScoped<IItemService, ItemService>();
