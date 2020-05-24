@@ -5,6 +5,9 @@
                 <span style="display:none"><i>Authenticating you... just a sec</i></span>
                 <div class="page-loader"></div>
             </Authorizing>
+            <NotAuthorized>
+                <PageRedirect Url="/Login" />
+            </NotAuthorized>
         </AuthorizeRouteView>
     </Found>
     <NotFound>

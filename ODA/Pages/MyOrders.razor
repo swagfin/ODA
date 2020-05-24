@@ -1,0 +1,103 @@
+﻿@page "/MyOrders"
+@attribute [Authorize]
+@inject IOrderService OrderService
+@inject ICustomerService CustomerService
+@inject AuthenticationStateProvider AuthProvider
+<TopBackNavBar NavLabel="My Orders" NavigationLink="/MyAccount" />
+
+@if (MyOrdersList == null)
+{
+    <br />
+    <br />
+    <ContentLoader />
+}
+else if (MyOrdersList.Count() < 1)
+{
+    <div class="block-content block-content-full pt-80 pb-80 height-100-percent px-15">
+        <div class="text-center mt-50 font-w600 text-muted">You have not placed any order yet.</div>
+    </div>
+}
+else
+{
+    <div class="block-content block-content-full pt-80 pb-80 height-100-percent px-15" style="background:#f2f2f2">
+        @foreach (var order in MyOrdersList)
+        {
+            <div class="mb-20 bg-white p-3" style="border-radius: 0.275rem;">
+
+                <div class="pull-right">
+                    <a class="btn btn-square btn-outline-secondary mb-10 order-track-button" href="/MyOrders" style="position: relative;">
+                        @(order.OrderStatus == OrderStatus.PendingPayment.ToString() ? "Pending Payment" : order.OrderStatus )
+                        <span class="pulse ml-2"></span>
+                    </a>
+                </div>
+
+                <div class="display-flex">
+                    <div class="flex-auto">
+                        <button class="mr-5 btn btn-square btn-outline-secondary min-width-125 mb-10 order-status-button text-muted false ">Order Placed</button>
+                    </div>
+                </div><span class="text-muted pull-right" style="font-size: 0.9rem;"><time>@TimeAgo.Format(order.OrderDate)</time></span>
+                <div class="flex-auto">
+                    <h6 class="font-w700" style="color: rgb(252, 128, 25);">@order.OrderRef</h6>
+                </div>
+                <hr>
+                @if (order.OrderItems != null && order.OrderItems.Count > 0)
+                {
+                    foreach (var orderItem in order.OrderItems)
+                    {
+                        <div class="display-flex pb-5">
+                            <span class="order-item-quantity mr-10">x@(string.Format("{0:N0}",orderItem.Quantity))</span>
+                            <div class="flex-auto text-left">@orderItem.ItemName</div>
+                            <div class="flex-auto text-right">@(string.Format("Ksh. {0:N2}", orderItem.TotalCost))</div>
+                        </div>
+                    }
+                }
+                <div class="display-flex mt-10 font-w700">
+                    <div class="flex-auto"></div>
+                    <div class="flex-auto text-right">@string.Format("Total Order Ksh. {0:N2}", order.DueAmount)</div>
+                </div>
+
+                <div class="pull-right">
+                    <button @onclick="(()=> CancelOrder(order.Id,order.OrderRef))" class="btn btn-square btn-sm btn-outline-danger mb-0 mt-15" style="position: relative; font-size: 0.8rem;">
+                        Cancel Order
+                    </button>
+
+                </div>
+                <div class="clearfix"></div>
+            </div>
+        }
+    </div>
+}
+@code{
+    private IEnumerable<Order> MyOrdersList { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var IdentityUser = await AuthProvider.GetAuthenticationStateAsync();
+            if (IdentityUser.User.Identity == null)
+                nav.NavigateTo("/login/redirect/MyOrders");
+            else
+            {
+                //Get User By Email Address
+                string customerEmailIdentity = IdentityUser.User.Identity.Name;
+                var customerInfo = await CustomerService.GetByEmailAsync(customerEmailIdentity);
+                if (customerInfo != null)
+                {
+                    var allOrders = await OrderService.GetOrdersByCustomerIdAsync(customerInfo.Id);
+                    //Dont Display Cancelled Orders
+                    MyOrdersList = allOrders.Where(x => x.OrderStatus != OrderStatus.Cancelled.ToString()).ToList();
+                }
+            }            //Get Authenticated User
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+
+    private void CancelOrder(int orderId, string orderRef)
+    {
+        nav.NavigateTo($"/CancelOrder/{orderRef}");
+    }
+
+}

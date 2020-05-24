@@ -23,7 +23,7 @@
 
             <label class="col-12 edit-address-input-label">Name </label>
             <div class="col-md-9 pb-5">
-                <InputText placeholder="Full Name" @bind-Value="User.FullName" auto-complete="off" class="form-control edit-address-input" />
+                <InputText placeholder="Full Name" autofocus="true" @bind-Value="User.FullName" auto-complete="off" class="form-control edit-address-input" />
                 <ValidationMessage For="@(() => User.FullName)" />
             </div>
 
@@ -47,7 +47,17 @@
 
         </div>
         <div class="mt-20 px-15 pt-15 button-block">
-            <button type="submit" class="btn btn-main" style="background-color: rgb(252, 128, 25);">REGISTER</button>
+            @if (IsContentLoading)
+            {
+                <ContentLoader />
+                <button type="button" disabled class="btn btn-main" style="background-color: rgb(252, 128, 25);">
+                    REGISTER
+                </button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-main" style="background-color: rgb(252, 128, 25);">REGISTER</button>
+            }
         </div>
     </EditForm>
     <div class="text-center mt-50 mb-20">Already have an account? <a style="color: rgb(252, 128, 25);" href="/login@(string.IsNullOrWhiteSpace(RedirectUrl)==false ? $"/redirect/{RedirectUrl}": "")">Go to Login</a></div>
@@ -62,14 +72,15 @@
     private RegisterViewModel User { get; set; } = new RegisterViewModel();
     [Parameter]
     public string RedirectUrl { get; set; }
-    public string NotificationMessage { get; set; }
+    private string NotificationMessage { get; set; }
+    private bool IsContentLoading { get; set; } = false;
     private async Task RegisterRequest()
     {
         // validate user
         try
         {
             NotificationMessage = null;
-
+            IsContentLoading = true;
             //Verify First If Customer Exists
             bool accExist = await customerService.VerifyExistsAsync(User.PrimaryMobile, User.EmailAddress);
             if (accExist)
@@ -114,6 +125,9 @@
         {
             NotificationMessage = "Oops Unable to Register Account. Please Try Again Later";
         }
-
+        finally
+        {
+            IsContentLoading = false;
+        }
     }
 }

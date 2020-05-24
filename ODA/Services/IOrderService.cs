@@ -12,10 +12,10 @@ namespace ODA.Services
         Task UpdateOrderAsync(Order order);
         Task RemoveOrderAsync(int Id);
         Task RemoveOrderAsync(Order order);
-        Task CancelOrderAsync(Order order);
-        Task CancelOrderAsync(int orderId);
+        Task CancelOrderAsync(string orderRefNo);
         Task<bool> ValidateOrderAsync(Order order);
         Task<bool> ValidateOrderAsync(int orderId);
-        Task<IEnumerable<Order>> GetOrdersByCustomerIdAsync(int customerId, OrderStatus status);
+        Task<IEnumerable<Order>> GetOrdersByCustomerIdAsync(int customerId);
+        Task UpdateOrderStatusAsync(OrderStatus orderStatus, int orderId);
     }
 }

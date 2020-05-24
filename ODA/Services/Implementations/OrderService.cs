@@ -19,6 +19,13 @@ namespace ODA.Services.Implementations
         {
             Db.Orders.Add(order);
             Db.SaveChanges();
+            //Update the Customer Order
+            if (order.CustomerId != null)
+            {
+                var customer = Db.Customers.Where(x => x.Id == order.CustomerId).FirstOrDefault();
+                customer.PlacedOrders += 1;
+                Db.SaveChanges();
+            }
         }
 
         public Task ProcessOrderAsync(Order order)
@@ -44,7 +51,7 @@ namespace ODA.Services.Implementations
 
         public Order GetOrderById(int Id)
         {
-            return Db.Orders.FirstOrDefault(x => x.Id == Id);
+            return Db.Orders.Include(x => x.OrderItems).FirstOrDefault(x => x.Id == Id);
         }
 
         public Task<Order> GetOrderByIdAsync(int Id)
@@ -97,42 +104,68 @@ namespace ODA.Services.Implementations
             });
         }
 
-        public IEnumerable<Order> GetAllByCustomerId(int CustomerId, OrderStatus status)
+        public IEnumerable<Order> GetAllByCustomerId(int CustomerId)
         {
-            return Db.Orders.Include(x => x.Restaurant).Include(x => x.OrderItems).Where(x => x.CustomerId == CustomerId && x.OrderStatus == status.ToString()).OrderByDescending(x => x.Id).AsNoTracking().ToList();
+            return Db.Orders.Include(x => x.Restaurant).Include(x => x.OrderItems).Where(x => x.CustomerId == CustomerId).OrderByDescending(x => x.Id).AsNoTracking().ToList();
         }
 
-        public Task<IEnumerable<Order>> GetOrdersByCustomerIdAsync(int customerId, OrderStatus status)
+        public Task<IEnumerable<Order>> GetOrdersByCustomerIdAsync(int customerId)
         {
             return Task.Run(() =>
             {
-                return GetAllByCustomerId(customerId, status);
+                return GetAllByCustomerId(customerId);
             });
         }
-
-        public void CancelOrder(int orderId)
+        //Cancel By Reference Number
+        public void CancelOrder(string orderRefNo)
         {
-            var foundOrder = GetOrderById(orderId);
+            if (string.IsNullOrWhiteSpace(orderRefNo))
+                return;
+            var foundOrder = Db.Orders.Where(x => x.OrderRef == orderRefNo).FirstOrDefault();
             if (foundOrder != null)
             {
                 foundOrder.OrderStatus = OrderStatus.Cancelled.ToString();
-                //Do something when user cancelles an Order e.g. Charges
                 Db.SaveChanges();
+                //Do something when user cancelles an Order e.g. Charges, Notifications
+                if (foundOrder.CustomerId != null)
+                {
+                    var customer = Db.Customers.Where(x => x.Id == foundOrder.CustomerId).FirstOrDefault();
+                    customer.CancelledOrders += 1;
+                    Db.SaveChanges();
+                }
             }
         }
-        public Task CancelOrderAsync(Order order)
+        public Task CancelOrderAsync(string orderRefNo)
         {
             return Task.Run(() =>
             {
-                CancelOrder(order.Id);
+                CancelOrder(orderRefNo);
             });
         }
 
-        public Task CancelOrderAsync(int orderId)
+        public void UpdateOrderStatus(OrderStatus orderStatus, int orderId)
+        {
+            var foundOrder = Db.Orders.Where(x => x.Id == orderId).FirstOrDefault();
+            if (foundOrder != null)
+            {
+                foundOrder.OrderStatus = orderStatus.ToString();
+                Db.SaveChanges();
+                //Notification Status Order Changed
+
+                if (foundOrder.CustomerId != null && orderStatus == OrderStatus.Cancelled)
+                {
+                    var customer = Db.Customers.Where(x => x.Id == foundOrder.CustomerId).FirstOrDefault();
+                    customer.CancelledOrders += 1;
+                    Db.SaveChanges();
+                }
+            }
+        }
+
+        public Task UpdateOrderStatusAsync(OrderStatus orderStatus, int orderId)
         {
             return Task.Run(() =>
             {
-                CancelOrder(orderId);
+                UpdateOrderStatus(orderStatus, orderId);
             });
         }
 

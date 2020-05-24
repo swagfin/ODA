@@ -1,0 +1,22 @@
+﻿@if (ChildContent == null)
+{
+    <span><i>Redirecting you to @(Url).... just a sec</i></span>
+}
+else
+{
+    @ChildContent
+}
+@code {
+    [Parameter]
+    public RenderFragment ChildContent { get; set; }
+    [Parameter]
+    public string Url { get; set; } = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        if (string.IsNullOrWhiteSpace(Url))
+            nav.NavigateTo("/");
+        else
+            nav.NavigateTo(Url);
+    }
+}

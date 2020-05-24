@@ -11,7 +11,7 @@
                     }
                     else
                     {
-                        <button type="button" onclick='location.href="@(NavigationLink)"' class="btn search-navs-btns back-button" style="position: relative;">
+                        <button type="button" @onclick="NavigateToUrl" class="btn search-navs-btns back-button" style="position: relative;">
                             <i class="si si-arrow-left"></i>
                         </button>
                     }
@@ -32,4 +32,8 @@
     [Parameter]
     public string NavigationLink { get; set; } = "/";
 
+    private void NavigateToUrl()
+    {
+        nav.NavigateTo(NavigationLink);
+    }
 }

@@ -24,7 +24,7 @@ namespace ODA.Entity
         public string Location { get; set; }
         public double PlacedOrders { get; set; } = 0;
         public double CancelledOrders { get; set; } = 0;
-        public double CompletedOrders { get; set; } = 0;
+        public double LoyaltyWalletBalance { get; set; } = 0;
         [StringLength(255)]
         public string TokenKey { get; set; } = Guid.NewGuid().ToString();
     }

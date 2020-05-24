@@ -34,7 +34,11 @@
                 </div>
             </div>
         </div>
-        @if (AllItems != null && AllItems.Count() > 0)
+        @if (AllItems == null)
+        {
+            <ContentLoader />
+        }
+        else if (AllItems.Count() > 0)
         {
 
             @foreach (var item in AllItems)

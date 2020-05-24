@@ -1,0 +1,96 @@
+﻿@page "/MyAccount"
+@attribute [Authorize]
+@inject ICustomerService CustomerService
+@inject AuthenticationStateProvider AuthProvider
+<div>
+    <div class="block-content block-content-full bg-white">
+        <h2 class="font-w600 mb-10">@ACName</h2>
+        <p class="text-muted">@ACMobile | @ACEmail</p>
+        <hr class="hr-bold">
+    </div>
+    <div class="Collapsible">
+        <span class="Collapsible__trigger is-open">My Account</span>
+        <div class="Collapsible__contentOuter" style="height: auto; transition: none 0s ease 0s; overflow: hidden;">
+            <div class="Collapsible__contentInner">
+
+                <div class="category-list-item">
+                    <a href="/MyOrders">
+                        <div class="display-flex py-2">
+                            <div class="mr-10 border-0"><i class="si si-basket-loaded"></i></div>
+                            <div class="flex-auto border-0">My Orders</div>
+                            <div class="flex-auto text-right"><i class="si si-arrow-right"></i></div>
+                        </div>
+                    </a>
+                </div>
+                <div class="category-list-item">
+                    <a href="/LoyaltyWallet">
+                        <div class="display-flex py-2">
+                            <div class="mr-10 border-0"><i class="si si-wallet"></i></div>
+                            <div class="flex-auto border-0">Loyalty Wallet</div>
+                            <div class="flex-auto text-right"><i class="si si-arrow-right"></i></div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="category-list-item">
+                    <a href="">
+                        <div class="display-flex py-2">
+                            <div class="mr-10 border-0"><i class="si si-question"></i></div>
+                            <div class="flex-auto border-0">Help &amp; FAQs</div>
+                            <div class="flex-auto text-right"><i class="si si-arrow-right"></i></div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="block-content block-content-full bg-white" @onclick="Logout" style="cursor:pointer" title="Click to Logout">
+        <div class="display-flex">
+            <div class="flex-auto logout-text">Logout</div>
+            <div class="flex-auto text-right"><i class="si si-power logout-icon"></i></div>
+        </div>
+    </div>
+    <p></p>
+</div>
+
+<BottomNavMenu />
+
+@code{
+    private string ACName { get; set; }
+    private string ACEmail { get; set; }
+    private string ACMobile { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var IdentityUser = await AuthProvider.GetAuthenticationStateAsync();
+            if (IdentityUser.User.Identity == null)
+                nav.NavigateTo("/login/redirect/MyAccount");
+            else
+            {
+                string customerEmailIdentity = IdentityUser.User.Identity.Name;
+                var customerInfo = await CustomerService.GetByEmailAsync(customerEmailIdentity);
+                if (customerInfo == null)
+                    throw new Exception($"No Customer found registered with this Email: {customerEmailIdentity}");
+                //Proceed
+                ACName = customerInfo.FullName;
+                ACEmail = customerInfo.EmailAddress;
+                ACMobile = customerInfo.PhoneNumber;
+            }
+        }
+        catch (Exception)
+        {
+
+            nav.NavigateTo("/Login/redirect/MyAccount");
+        }
+
+    }
+
+    private void Logout()
+    {
+        nav.NavigateTo("/Logout");
+    }
+}

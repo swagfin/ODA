@@ -1,0 +1,47 @@
+﻿@page "/LoyaltyWallet"
+@attribute [Authorize]
+@inject ICustomerService CustomerService
+@inject AuthenticationStateProvider AuthProvider
+
+<TopBackNavBar NavLabel="Loyalty Wallet Balance" NavigationLink="/MyAccount" />
+
+<div class="block-content block-content-full pt-80 pb-80 height-100-percent px-15">
+    <h3 class="btn btn-lg btn-outline-secondary btn-square d-block" style="border-color: rgb(238, 238, 238);">
+        Wallet <span style="color: rgb(252, 128, 25);">@string.Format("Ksh. {0:N2}", ACLoyaltyBalance)</span>
+    </h3>
+    <div class="text-center mt-50 font-w600 text-muted">Will keep updating your Wallet when you Order and Continue to use our app. This Walllet Balance is redeemable.</div>
+</div>
+
+
+@code{
+    private double ACLoyaltyBalance { get; set; } = 0;
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var IdentityUser = await AuthProvider.GetAuthenticationStateAsync();
+            if (IdentityUser.User.Identity == null)
+                nav.NavigateTo("/login/redirect/LoyaltyWallet");
+            else
+            {
+                string customerEmailIdentity = IdentityUser.User.Identity.Name;
+                var customerInfo = await CustomerService.GetByEmailAsync(customerEmailIdentity);
+                if (customerInfo == null)
+                    throw new Exception($"No Customer found registered with this Email: {customerEmailIdentity}");
+                //Proceed
+                ACLoyaltyBalance = customerInfo.LoyaltyWalletBalance;
+            }
+        }
+        catch (Exception)
+        {
+
+            nav.NavigateTo("/Login/redirect/LoyaltyWallet");
+        }
+
+    }
+
+    private void Logout()
+    {
+        nav.NavigateTo("/Logout");
+    }
+}

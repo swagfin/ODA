@@ -1,5 +1,9 @@
 ﻿@page "/Checkout"
 @inject ICartService ShoppingCart
+@inject IOrderService OrderService
+@inject ICustomerService CustomerService
+@inject IRestaurantService RestaurantService
+@inject AuthenticationStateProvider AuthProvider
 
 <TopBackNavBar NavLabel="Checkout" NavigationLink="/Cart" />
 <div class="pt-50">
@@ -10,30 +14,63 @@
                 To Pay <span style="color: rgb(252, 128, 25);">@string.Format("Ksh. {0:N2}", AmountToPay)</span>
             </h3>
         </div>
-        <div class="row">
-            <hr>
-            <div class="col-12 text-center mb-0 mt-4">
-                <h4 class="text-muted">Select your prefered payment method</h4>
-            </div>
+        @if (IsCheckingOut)
+        {
+            <ContentLoader />
+        }
+        else if (AmountToPay > 0)
+        {
+            <AuthorizeView>
+                <Authorized>
+                    <div class="row">
+                        <hr>
+                        <div class="col-12 text-center mb-0 mt-4">
+                            <h4 class="text-muted">Select your prefered payment method</h4>
+                        </div>
 
-            <a class="col-12 paymentGatewayBlock" href="?paying">
-                <div class="block block-link-shadow text-left shadow-light">
-                    <div class="block-content block-content-full clearfix py-3 payment-select-block">
-                        <div class="float-right mt-10"><img src="/assets/img/mpesa.png" alt="MPESA" class="img-fluid"></div>
-                        <div class="font-size-h3 font-w600">MPESA</div>
-                        <div class="font-size-sm font-w600 text-muted">Mpesa Buy Goods &amp; Services</div>
+                        <a class="col-12 paymentGatewayBlock" @onclick='(()=> ProcessCheckout("MPESA"))' style="cursor:pointer" title="Click to Pay via MPESA">
+                            <div class="block block-link-shadow text-left shadow-light">
+                                <div class="block-content block-content-full clearfix py-3 payment-select-block">
+                                    <div class="float-right mt-10"><img src="/assets/img/mpesa.png" alt="MPESA" class="img-fluid"></div>
+                                    <div class="font-size-h3 font-w600">MPESA</div>
+                                    <div class="font-size-sm font-w600 text-muted">Mpesa Buy Goods &amp; Services</div>
+                                </div>
+                            </div>
+                        </a>
                     </div>
-                </div>
-            </a>
-        </div>
+
+                </Authorized>
+                <NotAuthorized>
+                    <div class="bg-white cart-checkout-block" style="height: 22vh;">
+                        <div class="p-15">
+                            <h2 class="almost-there-text m-0 pb-5">Almost There</h2>
+                            <span class="almost-there-sub text-muted">Login or Signup to Checkout your order</span>
+                            <a class="btn btn-lg btn-continue" style="background-color: rgb(252, 128, 25); position: relative;" href="/login/redirect/Checkout">Continue</a>
+                        </div>
+                    </div>
+                </NotAuthorized>
+            </AuthorizeView>
+
+        }
+
+
+
+
     </div>
 
 
 </div>
 
+@if (!string.IsNullOrWhiteSpace(NotificationMessage))
+{
+    <Notification Message="@NotificationMessage" />
+}
+
 @code{
 
+    private string NotificationMessage { get; set; }
     private double AmountToPay { get; set; } = 0;
+    private bool IsCheckingOut { get; set; } = false;
 
     protected override async Task OnInitializedAsync()
     {
@@ -45,6 +82,8 @@
                 nav.NavigateTo("/Cart");
                 return;
             }
+
+            //Get Authentication Sate
             AmountToPay = await ShoppingCart.GetTotalDueAsync();
         }
         catch (Exception)
@@ -53,4 +92,78 @@
         }
     }
 
+    private async Task ProcessCheckout(string paymentMethod)
+    {
+        try
+        {
+            IsCheckingOut = true;
+
+            NotificationMessage = null;
+            var IdentityUser = await AuthProvider.GetAuthenticationStateAsync();
+            if (IdentityUser.User.Identity == null)
+                nav.NavigateTo("/login/redirect/Checkout");
+            else
+            {
+                //Get User By Email Address
+                string customerEmailIdentity = IdentityUser.User.Identity.Name;
+                var customerInfo = await CustomerService.GetByEmailAsync(customerEmailIdentity);
+                if (customerInfo == null)
+                    throw new Exception($"No Customer found registered with this Email: {customerEmailIdentity}");
+                //Get Shopping Cart
+                var cartOrderItems = await ShoppingCart.GetShoppingListAsync();
+                if (cartOrderItems.Count < 1)
+                    throw new Exception("No Items Added to Cart");
+
+                //Since we Now Get First One
+                //Get OR verify the Restaurant ID, If Open Closed Etc
+                int restaurantId = (int)cartOrderItems.FirstOrDefault().OrderRestaurantId;
+                var restaurantInfo = await RestaurantService.GetAsync(restaurantId);
+                if (restaurantInfo == null)
+                    throw new Exception($"The cart items added do not have a verified restaurant. Please Empty Cart and Try Again");
+
+                //Example of Ref No: OD-04-19-YUHI-YVRVGELR9
+                string orderRefNo = string.Format("OD-{0}-{1}-{2}-{3}", DateTime.Now.ToString("dd"), DateTime.Now.ToString("MM"), OrderNoGenerator.Generate(4), OrderNoGenerator.Generate(9));
+                double totalDue = cartOrderItems.Sum(x => x.TotalCost);
+                //Prepare an Order
+                Order order = new Order
+                {
+                    CustomerId = customerInfo.Id,
+                    CustomerName = customerInfo.FullName,
+                    CustomerMobile = customerInfo.PhoneNumber,
+                    DueAmount = totalDue,
+                    SubTotal = totalDue,
+                    RestaurantId = restaurantInfo.Id,
+                    RestaurantName = restaurantInfo.RegisteredName,
+                    OrderItems = cartOrderItems,
+                    OrderStatus = OrderStatus.PendingPayment.ToString(),
+                    PayMethod = paymentMethod,
+                    TotalItems = cartOrderItems.Sum(x => x.Quantity),
+                    OrderRef = orderRefNo
+
+                };
+
+                //Finlay Process Order | Hold Pending
+                await OrderService.ProcessOrderAsync(order);
+                //Clear Cart If No Error Is Raisd
+                await ShoppingCart.EmptyShoppingCartAsync();
+
+                //PAYMENTS
+                NotificationMessage = $"CONFIRM PAYMENT Sent to your Mobile Phone :{customerInfo.PhoneNumber}";
+                //!Fly Out Notifications in this Area e.g. Email/ SMS
+                //e.g. Sms.SendAsync, Email.SendAsync
+
+                //Redirect this User to Checkout Success Page
+                nav.NavigateTo($"/CheckoutSuccess/{orderRefNo}");
+
+
+            }
+
+            IsCheckingOut = false;
+        }
+        catch (Exception ex)
+        {
+            NotificationMessage = $"Unable to Process Order, Error: {ex.Message}";
+            IsCheckingOut = false;
+        }
+    }
 }

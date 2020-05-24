@@ -19,8 +19,12 @@
         </div>
     </div>
 </div>
-
-@if (foundResults == null || foundResults.Count() < 1)
+@if (foundResults == null)
+{
+    <br />
+    <ContentLoader />
+}
+else if (foundResults.Count() < 1)
 {
     <div class="d-flex justify-content-center mt-100"><img class="img-fluid explore-bg" src="/assets/img/various/explore-bg.png" alt="Search for foods"></div>
     if (!string.IsNullOrWhiteSpace(SearchAs))

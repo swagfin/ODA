@@ -140,5 +140,17 @@ namespace ODA.Services.Implementations
                 return VerifyExists(phoneNumber, emailAddress);
             });
         }
+
+        public Customer GetByEmail(string emailAddress)
+        {
+            return Db.Customers.AsNoTracking().FirstOrDefault(x => x.EmailAddress == emailAddress);
+        }
+        public Task<Customer> GetByEmailAsync(string emailAddress)
+        {
+            return Task.Run(() =>
+            {
+                return GetByEmail(emailAddress);
+            });
+        }
     }
 }

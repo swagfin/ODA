@@ -10,6 +10,7 @@ namespace ODA.Services
         Task<IEnumerable<Customer>> GetAllAsync();
         Task<Customer> VerifyCredentialsAsync(string usernameOrEmail, string password);
         Task<Customer> GetAsync(int Id);
+        Task<Customer> GetByEmailAsync(string emailAddress);
         Task UpdateAsync(Customer customer);
         Task RemoveAsync(int Id);
         Task RemoveAsync(Customer customer);

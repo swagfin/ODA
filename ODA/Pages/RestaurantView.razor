@@ -3,132 +3,142 @@
 <div>
     <TopBackNavBar NavigationLink="/restaurants" />
 
-    <div class="height-25 bg-white">
+    @if (IsContentLoading)
+    {
+        <ContentLoader />
+    }
+    else
+    {
 
-        <a class="no-click">
-            <div class="pt-50">
-                <div class="block-content block-content-full pt-2">
-                    <img src="/images/restaurants/@Model.ImageFile" alt="@Model.RegisteredName" class="restaurant-image mt-0">
-                </div>
+        <div class="height-25 bg-white">
 
-                <div class="block-content block-content-full restaurant-info">
-                    @if (Model.RegisteredName != null)
-                    {
-                        <h4 class="font-w600 mb-5 text-dark">@Model.RegisteredName.ToUpper()</h4>
-                    }
+            <a class="no-click">
+                <div class="pt-50">
+                    <div class="block-content block-content-full pt-2">
+                        <img src="/images/restaurants/@Model.ImageFile" alt="@Model.RegisteredName" class="restaurant-image mt-0">
+                    </div>
 
-                    <div class="font-size-sm text-muted truncate-text text-muted">@SearchItem</div>
-                    <div class="text-center restaurant-meta mt-5 d-flex align-items-center justify-content-between text-muted">
-                        <div class="col-2 p-0 text-left"><i class="fa fa-star" style="color: rgb(252, 128, 25);"></i> @Model.Rating</div>
-                        <div class="col-4 p-0 text-center">
-                            <i class="si si-clock"></i>
-                            @if (Model != null)
-                            {
-                                @if (Model.IsOpened)
-                                {<span style="color:green">Opened</span>}
-                                else
-                                { <span style="color:orangered">Closed</span>};
+                    <div class="block-content block-content-full restaurant-info">
+                        @if (Model.RegisteredName != null)
+                        {
+                            <h4 class="font-w600 mb-5 text-dark">@Model.RegisteredName.ToUpper()</h4>
+                        }
+
+                        <div class="font-size-sm text-muted truncate-text text-muted">@SearchItem</div>
+                        <div class="text-center restaurant-meta mt-5 d-flex align-items-center justify-content-between text-muted">
+                            <div class="col-2 p-0 text-left"><i class="fa fa-star" style="color: rgb(252, 128, 25);"></i> @Model.Rating</div>
+                            <div class="col-4 p-0 text-center">
+                                <i class="si si-clock"></i>
+                                @if (Model != null)
+                                {
+                                    @if (Model.IsOpened)
+                                    {<span style="color:green">Opened</span>}
+                                    else
+                                    { <span style="color:orangered">Closed</span>};
 }
+                            </div>
+                            <div class="col-6 p-0 text-center"><i class="si si-wallet"></i> @Model.PriceEstimate</div>
                         </div>
-                        <div class="col-6 p-0 text-center"><i class="si si-wallet"></i> @Model.PriceEstimate</div>
                     </div>
                 </div>
-            </div>
-        </a>
-    </div>
-
-    <div class="col-12 mt-10" style="display:none">
-        <div class="input-group">
-            <input type="text" class="form-control items-search-box" @bind="SearchItem" placeholder="Search for items...">
-            <div class="input-group-append"><span class="input-group-text items-search-box-icon"><i class="si si-magnifier"></i></span></div>
+            </a>
         </div>
-    </div>
+
+        <div class="col-12 mt-10" style="display:none">
+            <div class="input-group">
+                <input type="text" class="form-control items-search-box" @bind="SearchItem" placeholder="Search for items...">
+                <div class="input-group-append"><span class="input-group-text items-search-box-icon"><i class="si si-magnifier"></i></span></div>
+            </div>
+        </div>
 
 
-    <div class="bg-grey-light mt-20">
-        <!--Recommended Items-->
-        @if (!string.IsNullOrWhiteSpace(SearchItem) && Model.Items != null)
-        {
-            //Take Only 8
-            var foundItems = Model.Items.Where(x => x.ItemName.ToLower().Contains(SearchItem.ToLower())).Take(8).ToList();
-            if (foundItems.Count > 0)
+        <div class="bg-grey-light mt-20">
+            <!--Recommended Items-->
+            @if (!string.IsNullOrWhiteSpace(SearchItem) && Model.Items != null)
             {
-                <div class="px-5">
-                    <h3 class="px-10 py-10 recommended-text mb-0">RECOMMENDED</h3>
-                    <div class="row m-0">
-                        @foreach (var item in foundItems)
-                        {
-                            <div class="col-6 p-0 d-flex justify-content-center px-5">
-                                <div class="block border-radius-275 recommended-item-shadow">
-                                    <div class="block-content recommended-item-content py-5 mb-5">
-                                        <a href="/ItemDetails/@item.ItemId"><img src="/images/items/@item.ImageFile" alt="@item.ItemName" class="react-reveal img-fluid recommended-item-image" style="animation-fill-mode: both; animation-duration: 500ms; animation-delay: 0ms; animation-iteration-count: 1; opacity: 1; animation-name: react-reveal-505777936172311-1;"></a>
-                                        <div class="my-2 recommended-item-meta">
-                                            <div class="px-5 text-left">
-                                                <span class="meta-name">@item.ItemName</span>
-                                                <br><span class="meta-price"><span>Ksh.  @string.Format("{0:N2}", item.SellingPrice)</span></span>
+                //Take Only 8
+                var foundItems = Model.Items.Where(x => x.ItemName.ToLower().Contains(SearchItem.ToLower())).Take(8).ToList();
+                if (foundItems.Count > 0)
+                {
+                    <div class="px-5">
+                        <h3 class="px-10 py-10 recommended-text mb-0">RECOMMENDED</h3>
+                        <div class="row m-0">
+                            @foreach (var item in foundItems)
+                            {
+                                <div class="col-6 p-0 d-flex justify-content-center px-5">
+                                    <div class="block border-radius-275 recommended-item-shadow">
+                                        <div class="block-content recommended-item-content py-5 mb-5">
+                                            <a href="/ItemDetails/@item.ItemId"><img src="/images/items/@item.ImageFile" alt="@item.ItemName" class="react-reveal img-fluid recommended-item-image" style="animation-fill-mode: both; animation-duration: 500ms; animation-delay: 0ms; animation-iteration-count: 1; opacity: 1; animation-name: react-reveal-505777936172311-1;"></a>
+                                            <div class="my-2 recommended-item-meta">
+                                                <div class="px-5 text-left">
+                                                    <span class="meta-name">@item.ItemName</span>
+                                                    <br><span class="meta-price"><span>Ksh.  @string.Format("{0:N2}", item.SellingPrice)</span></span>
+                                                </div>
+                                                <div class="d-flex btn-group btn-group-sm my-5 btn-full justify-content-around" role="group" aria-label="btnGroupIcons1">
+                                                    <button type="button" @onclick="@(()=>ReduceItem(item))" class="btn btn-add-remove">
+                                                        <span class="btn-dec">-</span>
+                                                    </button>
+                                                    <button type="button" @onclick="@(()=>AddItem(item))" class="btn btn-add-remove">
+                                                        <span class="btn-inc">+</span>
+                                                    </button>
+                                                </div>
                                             </div>
-                                            <div class="d-flex btn-group btn-group-sm my-5 btn-full justify-content-around" role="group" aria-label="btnGroupIcons1">
-                                                <button type="button" @onclick="@(()=>ReduceItem(item))" class="btn btn-add-remove">
+                                        </div>
+                                    </div>
+                                </div>
+
+                            }
+                        </div>
+                    </div>
+                }
+            }
+
+            @if (Model.Items != null && Model.Items.Count > 0)
+            {
+                var otherItems = Model.Items.ToList();
+
+
+                <div id="Beverages4">
+                    <div class="Collapsible">
+                        <span class="Collapsible__trigger is-open">This Restaurant Sells</span>
+                        <div class="Collapsible__contentOuter" style="height: auto; transition: none 0s ease 0s; overflow: hidden;">
+                            <div class="Collapsible__contentInner">
+
+                                @foreach (var other in otherItems)
+                                {
+                                    <div class="category-list-item" style="display: flex; justify-content: space-between;">
+                                        <a href="/ItemDetails/@other.ItemId"><img src="/images/items/@other.ImageFile" alt="@other.ItemName" class="react-reveal flex-item-image" style="animation-fill-mode: both; animation-duration: 500ms; animation-delay: 0ms; animation-iteration-count: 1; opacity: 1; animation-name: react-reveal-505777936172311-1;"></a>
+                                        <div class="flex-item-name">
+                                            <span class="item-name">@other.ItemName</span>
+                                            @if (other.IsNew)
+                                            {
+                                                <span class="item-badge" style="background-color: rgb(33, 150, 243);">New</span>
+                                            }
+                                            <br><span class="item-price"><span>Ksh. @string.Format("{0:N2}", other.SellingPrice)</span></span>
+                                        </div>
+                                        <div class="item-actions pull-right pb-0 mt-10">
+                                            <div class="btn-group btn-group-sm" role="group" aria-label="btnGroupIcons1">
+                                                <button type="button" @onclick="@(()=>ReduceItem(other))" class="btn btn-add-remove">
                                                     <span class="btn-dec">-</span>
                                                 </button>
-                                                <button type="button" @onclick="@(()=>AddItem(item))" class="btn btn-add-remove">
+                                                <button type="button" @onclick="@(()=>AddItem(other))" class="btn btn-add-remove">
                                                     <span class="btn-inc">+</span>
                                                 </button>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
+                                }
                             </div>
-
-                        }
-                    </div>
-                </div>
-            }
-        }
-
-        @if (Model.Items != null && Model.Items.Count > 0)
-        {
-            var otherItems = Model.Items.ToList();
-
-
-            <div id="Beverages4">
-                <div class="Collapsible">
-                    <span class="Collapsible__trigger is-open">This Restaurant Sells</span>
-                    <div class="Collapsible__contentOuter" style="height: auto; transition: none 0s ease 0s; overflow: hidden;">
-                        <div class="Collapsible__contentInner">
-
-                            @foreach (var other in otherItems)
-                            {
-                                <div class="category-list-item" style="display: flex; justify-content: space-between;">
-                                    <a href="/ItemDetails/@other.ItemId"><img src="/images/items/@other.ImageFile" alt="@other.ItemName" class="react-reveal flex-item-image" style="animation-fill-mode: both; animation-duration: 500ms; animation-delay: 0ms; animation-iteration-count: 1; opacity: 1; animation-name: react-reveal-505777936172311-1;"></a>
-                                    <div class="flex-item-name">
-                                        <span class="item-name">@other.ItemName</span>
-                                        @if (other.IsNew)
-                                        {
-                                            <span class="item-badge" style="background-color: rgb(33, 150, 243);">New</span>
-                                        }
-                                        <br><span class="item-price"><span>Ksh. @string.Format("{0:N2}", other.SellingPrice)</span></span>
-                                    </div>
-                                    <div class="item-actions pull-right pb-0 mt-10">
-                                        <div class="btn-group btn-group-sm" role="group" aria-label="btnGroupIcons1">
-                                            <button type="button" @onclick="@(()=>ReduceItem(other))" class="btn btn-add-remove">
-                                                <span class="btn-dec">-</span>
-                                            </button>
-                                            <button type="button" @onclick="@(()=>AddItem(other))" class="btn btn-add-remove">
-                                                <span class="btn-inc">+</span>
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
                         </div>
                     </div>
                 </div>
-            </div>
 
-        }
-        <div class="mb-50"></div>
-    </div>
+            }
+            <div class="mb-50"></div>
+        </div>
+
+    }
+
 </div>
 
 
@@ -161,12 +171,13 @@ else
 
     private bool CartUpdated { get; set; } = false;
 
-    public async Task AddItem(Item item)
+    private bool IsContentLoading { get; set; } = true;
+    private async Task AddItem(Item item)
     {
         await ShoppingCart.AddItemAsync(item);
         CartUpdated = true;
     }
-    public async Task ReduceItem(Item item)
+    private async Task ReduceItem(Item item)
     {
         await ShoppingCart.ReduceItemAsync(item);
         CartUpdated = true;
@@ -178,7 +189,7 @@ else
     {
         try
         {
-
+            IsContentLoading = true;
             //Get Restaurant By Id
             Model = await InjectedService.GetAsync(RestaurantId);
             if (Model == null)
@@ -191,6 +202,10 @@ else
         catch (Exception)
         {
 
+        }
+        finally
+        {
+            IsContentLoading = false;
         }
     }
 

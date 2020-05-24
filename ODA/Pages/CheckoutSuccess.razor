@@ -1,0 +1,32 @@
+﻿@page "/CheckoutSuccess/{OrderRef}"
+<TopBackNavBar NavLabel="@OrderRef" NavigationLink="/MyOrders" />
+<div>
+    <div class="bg-white height-100" style="position: absolute; top: 26.3rem;">
+        <div class="mt-15 mb-200">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="block block-link-shadow" style="text-align:center;margin:auto">
+                        <div class="block-content block-content-full clearfix py-0">
+                            <div class="float-right"><img src="/assets/img/order-placed.gif" class="img-fluid img-avatar" alt="Order Placed Successfully"></div>
+                            <div class="float-left mt-20" style="width: 75%;">
+                                <div class="font-w600 font-size-h4 mb-5">Order Placed Successfully</div>
+                                <div class="font-size-sm text-muted">Waiting for the restaurant to confirm your order</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr class="m-0">
+        </div>
+    </div>
+    <div>
+        <button onclick="location.href='/MyOrders'" class="btn btn-lg btn-refresh-status" style="background-color: rgb(96, 178, 70); color: rgb(255, 255, 255);">Go to My Orders <span class="hidden"><i class="fa fa-refresh fa-spin"></i></span></button>
+    </div>
+
+</div>
+
+@code{
+    [Parameter]
+    public string OrderRef { get; set; }
+
+}

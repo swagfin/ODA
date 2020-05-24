@@ -21,10 +21,10 @@
         <DataAnnotationsValidator />
         <div class="form-group px-15 pt-30">
 
-            <label class="col-12 edit-address-input-label">Email </label>
+            <label class="col-12 edit-address-input-label">Phone or Email </label>
 
             <div class="col-md-9 pb-5">
-                <InputText placeholder="Email or Phone" @bind-Value="User.EmailAddress" auto-complete="off" class="form-control edit-address-input" />
+                <InputText placeholder="Email or Phone" autofocus="true" @bind-Value="User.EmailAddress" auto-complete="off" class="form-control edit-address-input" />
                 <ValidationMessage For="@(() => User.EmailAddress)" />
             </div>
 
@@ -36,7 +36,17 @@
             </div>
         </div>
         <div class="mt-20 px-15 pt-15 button-block">
-            <button type="submit" class="btn btn-main" style="background-color: rgb(252, 128, 25);">LOGIN</button>
+            @if (IsContentLoading)
+            {
+                <ContentLoader />
+                <button type="button" disabled class="btn btn-main" style="background-color: rgb(252, 128, 25);">
+                    LOGIN
+                </button>
+            }
+            else
+            {
+                <button type="submit" class="btn btn-main" style="background-color: rgb(252, 128, 25);">LOGIN</button>
+            }
         </div>
     </EditForm>
     <div class="text-center mt-50 mb-20">Don't have an account? <a style="color: rgb(252, 128, 25);" href="/register@(string.IsNullOrWhiteSpace(RedirectUrl)==false ? $"/redirect/{RedirectUrl}": "")">Register</a></div>
@@ -51,12 +61,14 @@
     private LoginViewModel User { get; set; } = new LoginViewModel();
     [Parameter]
     public string RedirectUrl { get; set; }
-    public string NotificationMessage { get; set; }
+    private string NotificationMessage { get; set; }
+    private bool IsContentLoading { get; set; } = false;
     private async Task LoginUserRequest()
     {
         // validate user
         try
         {
+            IsContentLoading = true;
             NotificationMessage = null;
             //Verify Account
             Customer confirmedUser = await customerService.VerifyCredentialsAsync(User.EmailAddress, User.Password);
@@ -91,6 +103,10 @@
         catch (Exception)
         {
             NotificationMessage = "Oops Unable to Authenticate User. Please Try Again Later";
+        }
+        finally
+        {
+            IsContentLoading = false;
         }
 
     }

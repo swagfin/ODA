@@ -1,7 +1,7 @@
 ﻿@page "/cart"
 @inject ICartService ShoppingCart
-
-<div>
+@inject IRestaurantService RestaurantService
+<div style="background:#f2f2f2">
     <TopBackNavBar NavLabel="Cart" />
 
     @if (TotalCartItems < 1)
@@ -15,24 +15,25 @@
     else
     {
         <div>
-
-            <div class="bg-white">
-                <div class="bg-light pb-10" style="padding-top: 5rem;">
-                    <div class="block-content block-content-full pt-2"><img src="/assets/img/foods/choma-bite.jpg" alt="Wing Machine - College" class="restaurant-image mt-0"></div>
-                    <div class="block-content block-content-full restaurant-info">
-                        <h4 class="font-w600 mb-5 text-dark">Order To: Jimmy's Choma Bite Hotel</h4>
-                        <div class="font-size-sm text-muted truncate-text text-muted">Kuku Choma, Fry, Beaf</div>
-                        <div class="text-center restaurant-meta mt-5 d-flex align-items-center justify-content-between text-muted">
-                            <div class="col-2 p-0 text-left"><i class="fa fa-star" style="color: rgb(252, 128, 25);"></i> 4.7</div>
-                            <div class="col-4 p-0 text-center"><i class="si si-clock"></i> 15 MINS</div>
-                            <div class="col-6 p-0 text-center"><i class="si si-wallet"></i> $$</div>
+            @if (Restaurant != null)
+            {
+                <div class="bg-white">
+                    <div class="bg-light pb-10" style="padding-top: 5rem;">
+                        <div class="block-content block-content-full pt-2"><img src="/images/restaurants/@Restaurant.ImageFile" alt="@Restaurant.RegisteredName" class="restaurant-image mt-0"></div>
+                        <div class="block-content block-content-full restaurant-info">
+                            <h4 class="font-w600 mb-5 text-dark">@Restaurant.RegisteredName</h4>
+                            <div class="font-size-sm text-muted truncate-text text-muted">PLACING AN ORDER</div>
+                            <div class="text-center restaurant-meta mt-5 d-flex align-items-center justify-content-between text-muted">
+                                <div class="col-2 p-0 text-left"><i class="fa fa-star" style="color: rgb(252, 128, 25);"></i> @Restaurant.Rating</div>
+                                <div class="col-4 p-0 text-center"><i class="si si-clock"></i> @WaitingTime</div>
+                                <div class="col-6 p-0 text-center"><i class="si si-wallet"></i> Order Cost: @string.Format("{0:N2}", TotalCartItemsCost)</div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-
+            }
             <div class="block-content block-content-full bg-white pt-10 pb-5">
-                <h2 class="item-text mb-10">Jimmy's Choma Bite Hotel's Order</h2>
+                <h2 class="item-text mb-10">@(Restaurant !=null ? Restaurant.RegisteredName : "Restaurants")'s Order</h2>
                 @foreach (var item in CartItems)
                 {
 
@@ -85,7 +86,7 @@
             <Authorized>
                 <div class="bg-white cart-checkout-block" style="height: 22vh;">
                     <div class="p-15">
-                        <h2 class="almost-there-text m-0 pb-5">Jimmy's Choma Bite Hotel's Order</h2>
+                        <h2 class="almost-there-text m-0 pb-5">@(Restaurant !=null ? Restaurant.RegisteredName : "Restaurants")'s Order</h2>
                         <span class="almost-there-sub text-muted">Your Order will be placed to the above Restaurant</span>
                         <a class="btn btn-lg btn-continue" style="background-color: rgb(96, 178, 70); color: rgb(255, 255, 255); position: relative;" href="/checkout">Proceed to Checkout</a>
                     </div>
@@ -109,7 +110,8 @@
 
 
 @code{
-    public List<OrderItem> CartItems { get; set; } = new List<OrderItem>();
+    private List<OrderItem> CartItems { get; set; } = new List<OrderItem>();
+    private Restaurant Restaurant { get; set; }
     private int TotalCartItems
     {
         get
@@ -164,7 +166,22 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await ReloadCart();
+        try
+        {
+            await ReloadCart();
+            //Get Restaurant Name
+            if (TotalCartItems > 0)
+            {
+                int restaurantId = (int)CartItems.FirstOrDefault().OrderRestaurantId;
+                Restaurant = await RestaurantService.GetAsync(restaurantId);
+            }
+
+        }
+        catch (Exception)
+        {
+
+        }
+
     }
 
 

@@ -8,7 +8,7 @@ namespace ODA
     public enum OrderStatus
     {
         Completed,
-        Pending,
+        PendingPayment,
         Cancelled,
     }
 }
