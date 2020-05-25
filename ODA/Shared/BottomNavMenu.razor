@@ -32,14 +32,18 @@
 @code{
     [Parameter]
     public RenderFragment ChildContent { get; set; }
-    private int CartItems { get; set; } = 0;
+    [Parameter]
+    public int CartItems { get; set; } = 0;
+    [Parameter]
+    public bool OverideCartItems { get; set; } = false;
 
     //During Update
     protected override async Task OnParametersSetAsync()
     {
         try
         {
-            CartItems = await ShoppingCart.GetTotalItemsAsync();
+            if (!OverideCartItems)
+                CartItems = await ShoppingCart.GetTotalItemsAsync();
         }
         catch (Exception)
         {

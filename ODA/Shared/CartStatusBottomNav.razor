@@ -1,45 +1,24 @@
-﻿@inject ICartService ShoppingCart
-<div class="float-cart float-cart--open" style="background-color: rgb(96, 178, 70); color: rgb(255, 255, 255);">
-    <a class="text-white" href="/cart">
-        <span>@CartItems Items</span><span class="pl-5 pr-5">&nbsp;|&nbsp;</span><span>@string.Format("Ksh. {0:N2}", TotalCost)</span>
-        <span class="pull-right">View Cart <i class="si si-basket"></i></span>
-    </a>
-</div>
+﻿@if (IsVisible)
+{
+    <div class="float-cart float-cart--open" style="background-color: rgb(96, 178, 70); color: rgb(255, 255, 255);">
+        <a class="text-white" href="/cart">
+            <span>Successfully Updated @(string.IsNullOrWhiteSpace(RestaurantName) ? "Restaurant": RestaurantName)'s Order Cart</span><span class="pl-5 pr-5">&nbsp;</span>
+            <span class="pull-right">View Cart <i class="si si-basket"></i></span>
+        </a>
+    </div>
+}
 @ChildContent
 @code{
 
     [Parameter]
     public RenderFragment ChildContent { get; set; }
-    public List<OrderItem> Cart { get; set; } = new List<OrderItem>();
-    private int CartItems
-    {
-        get
-        {
-            if (Cart == null)
-                return 0;
-            return Cart.Sum(x => x.Quantity);
-        }
-    }
-    private double TotalCost
-    {
-        get
-        {
-            if (Cart == null)
-                return 0;
-            return Cart.Sum(x => x.TotalCost);
-        }
-    }
-
+    [Parameter]
+    public string RestaurantName { get; set; }
+    private bool IsVisible { get; set; } = false;
     protected override async Task OnParametersSetAsync()
     {
-        try
-        {
-            Cart = await ShoppingCart.GetShoppingListAsync();
-        }
-        catch (Exception)
-        {
-
-        }
+        IsVisible = false;
+        await Task.Delay(200);
+        IsVisible = true;
     }
-
 }

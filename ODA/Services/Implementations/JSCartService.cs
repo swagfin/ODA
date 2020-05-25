@@ -52,7 +52,7 @@ namespace ODA.Services.Implementations
         }
 
 
-        private Task PushShoppingCartAsync(List<OrderItem> cart)
+        public async Task PushShoppingCartAsync(List<OrderItem> cart)
         {
             if (cart == null)
                 cart = new List<OrderItem>();
@@ -61,7 +61,9 @@ namespace ODA.Services.Implementations
             //Encrypt string
             string encryptedCart = EncryptService.Encrypt(cartString, this.USER_CART_ENCRYPTION_KEY);
             //Save thate storage
-            return StorageService.SetItemAsync(ODAConstants.shoppingCart.ToString(), encryptedCart);
+            //Set Cart Items to Reduce latent Time
+            await StorageService.SetItemAsync(ODAConstants.shoppingCartItems.ToString(), cart.Sum(x => x.Quantity));
+            await StorageService.SetItemAsync(ODAConstants.shoppingCart.ToString(), encryptedCart);
         }
         public Task EmptyShoppingCartAsync()
         {
@@ -186,10 +188,22 @@ namespace ODA.Services.Implementations
             return Cart.Sum(x => x.Tax);
         }
 
+        /// <summary>
+        /// This Function tries to Make it Fast By getting the Quantity of Shopping Cart Count instead of Fetching Entire Cart then Getting the Quantity
+        /// </summary>
+        /// <returns></returns>
         public async Task<int> GetTotalItemsAsync()
         {
-            List<OrderItem> Cart = await GetShoppingListAsync();
-            return Cart.Sum(x => x.Quantity);
+            try
+            {
+                int count = await StorageService.GetItemAsync<int>(ODAConstants.shoppingCartItems.ToString());
+                return count;
+            }
+            catch (Exception)
+            {
+                return 0;
+            }
+
         }
 
         public async Task<string> VerifyCanCheckoutMessage()

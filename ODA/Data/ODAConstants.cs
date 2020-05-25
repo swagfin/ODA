@@ -9,6 +9,7 @@ namespace ODA
     {
         userLocation,
         userId,
-        shoppingCart
+        shoppingCart,
+        shoppingCartItems,
     }
 }

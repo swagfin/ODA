@@ -4,13 +4,21 @@
 <div style="background:#f2f2f2">
     <TopBackNavBar NavLabel="Cart" />
 
-    @if (TotalCartItems < 1)
+    @if (CartItems == null)
+    {
+
+        <div class="bg-white cart-empty-block">
+            <ContentLoader />
+        </div>
+
+    }
+    else if (TotalCartItems < 1)
     {
         <div class="bg-white cart-empty-block">
             <img class="cart-empty-img" src="/assets/img/cart-empty.png" alt="Your Cart is Empty">
             <h2 class="cart-empty-text mt-50 text-center">Your Cart is Empty</h2><p></p>
         </div>
-        <BottomNavMenu />
+        <BottomNavMenu CartItems="TotalCartItems" OverideCartItems="true" />
     }
     else
     {
@@ -88,7 +96,14 @@
                     <div class="p-15">
                         <h2 class="almost-there-text m-0 pb-5">@(Restaurant !=null ? Restaurant.RegisteredName : "Restaurants")'s Order</h2>
                         <span class="almost-there-sub text-muted">Your Order will be placed to the above Restaurant</span>
-                        <a class="btn btn-lg btn-continue" style="background-color: rgb(96, 178, 70); color: rgb(255, 255, 255); position: relative;" href="/checkout">Proceed to Checkout</a>
+                        @if (IsPreparing)
+                        {
+                            <ContentLoader />
+                        }
+                        else
+                        {
+                            <a class="btn btn-lg btn-continue" style="background-color: rgb(96, 178, 70); color: rgb(255, 255, 255); position: relative;cursor:pointer" @onclick="@(()=> GoToCheckout())">Proceed to Checkout</a>
+                        }
                     </div>
                 </div>
 
@@ -110,7 +125,7 @@
 
 
 @code{
-    private List<OrderItem> CartItems { get; set; } = new List<OrderItem>();
+    private List<OrderItem> CartItems { get; set; }
     private Restaurant Restaurant { get; set; }
     private int TotalCartItems
     {
@@ -141,34 +156,58 @@
         }
     }
 
-    public async Task AddItem(OrderItem item)
+    private Task AddItem(OrderItem item)
     {
-        await ShoppingCart.AddItemAsync(item);
-        await ReloadCart();
-    }
-    public async Task ReduceItem(OrderItem item)
-    {
-        await ShoppingCart.ReduceItemAsync(item);
-        await ReloadCart();
+        //THIS IS FOR THE UI UPDATE
+        var existItem = CartItems.FirstOrDefault(x => x.ItemId == item.ItemId);
+        if (existItem != null && string.IsNullOrEmpty(item.ItemNote))
+        {
+            existItem.Quantity += 1;
+            existItem.Rate = item.Rate;
+            existItem.Tax = item.Tax * existItem.Quantity;
+            existItem.TotalCost = item.Rate * existItem.Quantity;
+        }
+        else
+            CartItems.Add(item);
+        //THIS IS FOR THE SERVER UPDATE
+        return ShoppingCart.AddItemAsync(item);
     }
 
-    private async Task ReloadCart()
+    private Task ReduceItem(OrderItem item)
     {
-        try
+        //THIS IS FOR THE UI UPDATE
+        var existItem = CartItems.FirstOrDefault(x => x.ItemId == item.ItemId);
+        if (existItem != null && string.IsNullOrEmpty(existItem.ItemNote))
         {
-            CartItems = await ShoppingCart.GetShoppingListAsync();
+            //Check if Already Less or Equan to One
+            if (existItem.Quantity <= 1)
+                CartItems.Remove(existItem);
+            else
+            {
+                existItem.Quantity = (existItem.Quantity - 1);
+                existItem.Rate = item.Rate;
+                existItem.Tax = existItem.Tax * (existItem.Quantity - 1);
+                existItem.TotalCost = item.Rate * (existItem.Quantity - 1);
+            }
         }
-        catch (Exception)
-        {
+        //THIS IS FOR THE SERVER UPDATE
+        return ShoppingCart.ReduceItemAsync(item);
+    }
 
-        }
+    private bool IsPreparing { get; set; } = false;
+    private async Task GoToCheckout()
+    {
+        IsPreparing = true;
+        await ShoppingCart.PushShoppingCartAsync(CartItems);
+        nav.NavigateTo("/Checkout");
     }
 
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            await ReloadCart();
+
+            CartItems = await ShoppingCart.GetShoppingListAsync();
             //Get Restaurant Name
             if (TotalCartItems > 0)
             {

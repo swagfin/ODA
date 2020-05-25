@@ -1,7 +1,7 @@
 ﻿@page "/restaurant/{RestaurantId:int}"
 @page "/restaurant/{RestaurantId:int}/{SearchItem}"
 <div>
-    <TopBackNavBar NavigationLink="/restaurants" />
+    <TopBackNavBar NavigationLink="/restaurants" NavLabel="@(Model !=null ? Model.RegisteredName : "")" />
 
     @if (IsContentLoading)
     {
@@ -145,7 +145,7 @@
 
 @if (CartUpdated)
 {
-    <CartStatusBottomNav>
+    <CartStatusBottomNav RestaurantName="@(Model !=null ? Model.RegisteredName : "")">
         <span class="re-renderer"></span>
     </CartStatusBottomNav>
 }
@@ -168,19 +168,23 @@ else
     [Inject]
     ICartService ShoppingCart { get; set; }
     private Restaurant Model { get; set; } = new Restaurant();
+    //Use This for Quick Update
+    List<OrderItem> CurrentCart { get; set; } = new List<OrderItem>();
 
     private bool CartUpdated { get; set; } = false;
 
     private bool IsContentLoading { get; set; } = true;
-    private async Task AddItem(Item item)
+    private void AddItem(Item item)
     {
-        await ShoppingCart.AddItemAsync(item);
         CartUpdated = true;
+        //Don't await Send on the Fly
+        ShoppingCart.AddItemAsync(item);
     }
-    private async Task ReduceItem(Item item)
+    private void ReduceItem(Item item)
     {
-        await ShoppingCart.ReduceItemAsync(item);
         CartUpdated = true;
+        //Don't await Send on the Fly
+        ShoppingCart.ReduceItemAsync(item);
     }
 
 
@@ -197,7 +201,8 @@ else
                 nav.NavigateTo("/search");
                 return;
             }
-
+            //Load the Current Cart
+            CurrentCart = await ShoppingCart.GetShoppingListAsync();
         }
         catch (Exception)
         {
