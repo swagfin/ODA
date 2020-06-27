@@ -1,0 +1,73 @@
+﻿@page "/MyRestaurants/Add"
+@attribute [Authorize(Roles = "MerchantAC")]
+@inject IRestaurantService RestaurantService
+@inject AuthenticationStateProvider StateProvider
+
+<h3>My Restaurants Add</h3>
+
+<EditForm OnValidSubmit="RegisterRequest" Model="Model">
+    <DataAnnotationsValidator />
+    <div class="form-group px-15 pt-30">
+
+        <label class="col-12 edit-address-input-label">Registered Name</label>
+        <div class="col-md-9 pb-5">
+            <InputText placeholder="Restaurant registered Name" autofocus="true" @bind-Value="Model.RegisteredName" auto-complete="off" class="form-control edit-address-input" />
+            <ValidationMessage For="@(() => Model.RegisteredName)" />
+        </div>
+
+        <label class="col-12 edit-address-input-label">Contact Email </label>
+        <div class="col-md-9 pb-5">
+            <InputText placeholder="Email-Address" type="email" @bind-Value="Model.ContactEmail" auto-complete="off" class="form-control edit-address-input" />
+            <ValidationMessage For="@(() => Model.ContactEmail)" />
+        </div>
+
+        <label class="col-12 edit-address-input-label">Mobile Phone </label>
+        <div class="col-md-9 pb-5">
+            <InputText placeholder="Mobile Phone" @bind-Value="Model.ContactMobile" auto-complete="off" class="form-control edit-address-input" />
+            <ValidationMessage For="@(() => Model.ContactMobile)" />
+        </div>
+        <label class="col-12 edit-address-input-label">Location</label>
+        <div class="col-md-9 pb-5">
+            <InputText placeholder="Location / Address" @bind-Value="Model.Location" auto-complete="off" class="form-control edit-address-input" />
+            <ValidationMessage For="@(() => Model.Location)" />
+        </div>
+
+
+
+    </div>
+    <div class="mt-20 px-15 pt-15 button-block">
+        @if (IsContentLoading)
+        {
+            <ContentLoader />
+            <button type="button" disabled class="btn btn-main" style="background-color: rgb(252, 128, 25);">
+                REGISTER
+            </button>
+        }
+        else
+        {
+            <button type="submit" class="btn btn-main" style="background-color: rgb(252, 128, 25);">REGISTER</button>
+        }
+    </div>
+</EditForm>
+
+
+@code {
+    private Restaurant Model { get; set; } = new Restaurant();
+    private bool IsContentLoading { get; set; } = false;
+    private async Task RegisterRequest()
+    {
+        try
+        {
+            var userState = await StateProvider.GetAuthenticationStateAsync();
+            string customerId = userState.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+            Model.MerchantId = customerId;
+            await RestaurantService.AddAsync(Model);
+            nav.NavigateTo("/MyRestaurants");
+        }
+        catch (Exception)
+        {
+
+        }
+
+    }
+}

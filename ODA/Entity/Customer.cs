@@ -8,7 +8,7 @@ namespace ODA.Entity
 {
     public class Customer
     {
-        public int Id { get; set; }
+        public string Id { get; set; } = Guid.NewGuid().ToString();
         [Required]
         [StringLength(220)]
         public string FullName { get; set; }
@@ -21,7 +21,9 @@ namespace ODA.Entity
         public bool IsAccountConfirmed { get; set; } = false;
         [StringLength(180)]
         public string EmailAddress { get; set; }
-        public string Location { get; set; }
+        [StringLength(110), Required]
+        public string UserAccountType { get; set; }
+        public string Location { get; set; } = string.Empty;
         public double PlacedOrders { get; set; } = 0;
         public double CancelledOrders { get; set; } = 0;
         public double LoyaltyWalletBalance { get; set; } = 0;

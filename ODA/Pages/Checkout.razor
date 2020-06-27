@@ -105,10 +105,9 @@
             else
             {
                 //Get User By Email Address
-                string customerEmailIdentity = IdentityUser.User.Identity.Name;
-                var customerInfo = await CustomerService.GetByEmailAsync(customerEmailIdentity);
-                if (customerInfo == null)
-                    throw new Exception($"No Customer found registered with this Email: {customerEmailIdentity}");
+                string customerId = IdentityUser.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+                string customerName = IdentityUser.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name).Value;
+                string customerMobile = IdentityUser.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.MobilePhone).Value;
                 //Get Shopping Cart
                 var cartOrderItems = await ShoppingCart.GetShoppingListAsync();
                 if (cartOrderItems.Count < 1)
@@ -127,9 +126,9 @@
                 //Prepare an Order
                 Order order = new Order
                 {
-                    CustomerId = customerInfo.Id,
-                    CustomerName = customerInfo.FullName,
-                    CustomerMobile = customerInfo.PhoneNumber,
+                    CustomerId = customerId,
+                    CustomerName = customerName,
+                    CustomerMobile = customerMobile,
                     DueAmount = totalDue,
                     SubTotal = totalDue,
                     RestaurantId = restaurantInfo.Id,
@@ -148,7 +147,7 @@
                 await ShoppingCart.EmptyShoppingCartAsync();
 
                 //PAYMENTS
-                NotificationMessage = $"CONFIRM PAYMENT Sent to your Mobile Phone :{customerInfo.PhoneNumber}";
+                NotificationMessage = $"CONFIRM PAYMENT Sent to your Mobile Phone :{customerMobile}";
                 //!Fly Out Notifications in this Area e.g. Email/ SMS
                 //e.g. Sms.SendAsync, Email.SendAsync
 

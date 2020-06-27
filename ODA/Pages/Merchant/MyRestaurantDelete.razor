@@ -1,0 +1,63 @@
+﻿@page "/MyRestaurants/Delete/{Id:int}"
+@page "/MyRestaurants/Delete/{Id:int}/{Name}"
+@attribute [Authorize]
+@inject IRestaurantService RestaurantService
+@if (Id != 0)
+{
+    <div class="styles_overlay__CLSq- undefined">
+        <div class="styles_modal__gNwvD" role="dialog" aria-modal="true">
+            <div>
+                <div class="text-center mt-100">
+                    <div style="font-size: 1.2rem; font-weight: 500;">
+                        <i class="si si-info" style="font-size: 4rem; opacity: 0.3; color: rgb(255, 152, 0);"></i>
+                        <p>@Name #@Id</p>
+                        <p>Do you want to delete this Restaurant?</p>
+                    </div>
+                    <div>
+                        <button @onclick="ConfirmCancelOrder" class="btn btn-lg btn-danger mr-3" style="border: 0px none; border-radius: 0px; background-color: rgb(252, 128, 25);">Yes, Cancel Order</button>
+                        <button @onclick="AbortCancellation" class="btn btn-lg" style="border: 0px none; border-radius: 0px;">Go back</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (!string.IsNullOrWhiteSpace(NotificationMsg))
+{
+    <Notification Message="@NotificationMsg" />
+}
+@code{
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string Name { get; set; }
+    private string NotificationMsg { get; set; }
+
+    protected override void OnInitialized()
+    {
+        if (Id == 0)
+            nav.NavigateTo("/MyOrders");
+    }
+
+    private async Task ConfirmCancelOrder()
+    {
+        try
+        {
+            //Check Order Exist
+            NotificationMsg = null;
+            await RestaurantService.RemoveAsync(Id);
+            NotificationMsg = $"Restaurant No: {Id} has been Deleted Successfully";
+            nav.NavigateTo("/MyOrders");
+        }
+        catch (Exception)
+        {
+            NotificationMsg = $"Oops! Unable to Delete Restaurant No: {Id}. Please Try Again Later";
+        }
+
+    }
+    private void AbortCancellation()
+    {
+        nav.NavigateTo("/MyOrders");
+    }
+}

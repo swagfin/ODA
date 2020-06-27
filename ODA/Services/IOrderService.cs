@@ -15,7 +15,7 @@ namespace ODA.Services
         Task CancelOrderAsync(string orderRefNo);
         Task<bool> ValidateOrderAsync(Order order);
         Task<bool> ValidateOrderAsync(int orderId);
-        Task<IEnumerable<Order>> GetOrdersByCustomerIdAsync(int customerId);
+        Task<IEnumerable<Order>> GetOrdersByCustomerIdAsync(string customerId);
         Task UpdateOrderStatusAsync(OrderStatus orderStatus, int orderId);
     }
 }

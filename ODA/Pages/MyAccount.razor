@@ -1,5 +1,6 @@
 ﻿@page "/MyAccount"
 @attribute [Authorize]
+@using System.Security.Claims
 @inject ICustomerService CustomerService
 @inject AuthenticationStateProvider AuthProvider
 <div>
@@ -13,24 +14,63 @@
         <div class="Collapsible__contentOuter" style="height: auto; transition: none 0s ease 0s; overflow: hidden;">
             <div class="Collapsible__contentInner">
 
-                <div class="category-list-item">
-                    <a href="/MyOrders">
-                        <div class="display-flex py-2">
-                            <div class="mr-10 border-0"><i class="si si-basket-loaded"></i></div>
-                            <div class="flex-auto border-0">My Orders</div>
-                            <div class="flex-auto text-right"><i class="si si-arrow-right"></i></div>
-                        </div>
-                    </a>
-                </div>
-                <div class="category-list-item">
-                    <a href="/LoyaltyWallet">
-                        <div class="display-flex py-2">
-                            <div class="mr-10 border-0"><i class="si si-wallet"></i></div>
-                            <div class="flex-auto border-0">Loyalty Wallet</div>
-                            <div class="flex-auto text-right"><i class="si si-arrow-right"></i></div>
-                        </div>
-                    </a>
-                </div>
+                <AuthorizeView Roles="@(ODAConstants.CustomerAC.ToString())">
+                    <div class="category-list-item">
+                        <a href="/MyOrders">
+                            <div class="display-flex py-2">
+                                <div class="mr-10 border-0"><i class="si si-basket-loaded"></i></div>
+                                <div class="flex-auto border-0">My Orders</div>
+                                <div class="flex-auto text-right"><i class="si si-arrow-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="category-list-item">
+                        <a href="/LoyaltyWallet">
+                            <div class="display-flex py-2">
+                                <div class="mr-10 border-0"><i class="si si-wallet"></i></div>
+                                <div class="flex-auto border-0">Loyalty Wallet</div>
+                                <div class="flex-auto text-right"><i class="si si-arrow-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
+
+                </AuthorizeView>
+
+
+                <AuthorizeView Roles="@(ODAConstants.MerchantAC.ToString())">
+                    <div class="category-list-item">
+                        <a href="/MyOrders">
+                            <div class="display-flex py-2">
+                                <div class="mr-10 border-0"><i class="si si-basket-loaded"></i></div>
+                                <div class="flex-auto border-0">Received Orders</div>
+                                <div class="flex-auto text-right"><i class="si si-arrow-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
+
+                    <div class="category-list-item">
+                        <a href="/MyOrders">
+                            <div class="display-flex py-2">
+                                <div class="mr-10 border-0"><i class="si si-basket-loaded"></i></div>
+                                <div class="flex-auto border-0">Restaurant Info</div>
+                                <div class="flex-auto text-right"><i class="si si-arrow-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="category-list-item">
+                        <a href="/LoyaltyWallet">
+                            <div class="display-flex py-2">
+                                <div class="mr-10 border-0"><i class="si si-book-open"></i></div>
+                                <div class="flex-auto border-0">Products and Services</div>
+                                <div class="flex-auto text-right"><i class="si si-arrow-right"></i></div>
+                            </div>
+                        </a>
+                    </div>
+
+                </AuthorizeView>
+
+
+
 
                 <div class="category-list-item">
                     <a href="">
@@ -71,14 +111,9 @@
                 nav.NavigateTo("/login/redirect/MyAccount");
             else
             {
-                string customerEmailIdentity = IdentityUser.User.Identity.Name;
-                var customerInfo = await CustomerService.GetByEmailAsync(customerEmailIdentity);
-                if (customerInfo == null)
-                    throw new Exception($"No Customer found registered with this Email: {customerEmailIdentity}");
-                //Proceed
-                ACName = customerInfo.FullName;
-                ACEmail = customerInfo.EmailAddress;
-                ACMobile = customerInfo.PhoneNumber;
+                ACName = IdentityUser.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Name).Value;
+                ACEmail = IdentityUser.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.Email).Value;
+                ACMobile = IdentityUser.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.MobilePhone).Value;
             }
         }
         catch (Exception)

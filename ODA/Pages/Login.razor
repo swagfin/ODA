@@ -86,7 +86,8 @@
                     EmailAddress = confirmedUser.EmailAddress,
                     FullName = confirmedUser.FullName,
                     IsAccountConfirmed = confirmedUser.IsAccountConfirmed,
-                    Location = confirmedUser.Location,
+                    Location = confirmedUser.Location ?? string.Empty,
+                    Role = confirmedUser.UserAccountType,
                     PhoneNumber = confirmedUser.PhoneNumber
                 };
 

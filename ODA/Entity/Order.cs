@@ -15,7 +15,7 @@ namespace ODA.Entity
         public string TransactionType { get; set; } = "ORDER";
         public int? RestaurantId { get; set; }
         public string RestaurantName { get; set; }
-        public int? CustomerId { get; set; }
+        public string CustomerId { get; set; }
         public string CustomerName { get; set; }
         public string CustomerMobile { get; set; }
         public int TotalItems { get; set; } = 0;

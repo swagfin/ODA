@@ -1,0 +1,112 @@
+﻿@page "/MyRestaurants/{id:int}"
+@page "/MyRestaurants/{id:int}/{RestaurantName}"
+@inject IRestaurantService RestaurantService
+
+
+<TopBackNavBar NavigationLink="/MyRestaurants" NavLabel="@(Model !=null ? Model.RegisteredName : "")" />
+
+<div class="height-25 bg-white">
+
+    <a class="no-click">
+        <div class="pt-50">
+            <div class="block-content block-content-full pt-2">
+                <img src="/images/restaurants/@Model.ImageFile" alt="@Model.RegisteredName" class="restaurant-image mt-0">
+            </div>
+
+            <div class="block-content block-content-full restaurant-info">
+                @if (Model.RegisteredName != null)
+                {
+                    <h4 class="font-w600 mb-5 text-dark">@Model.RegisteredName.ToUpper()</h4>
+                }
+
+                <div class="font-size-sm text-muted truncate-text text-muted">@SearchItem</div>
+                <div class="text-center restaurant-meta mt-5 d-flex align-items-center justify-content-between text-muted">
+                    <div class="col-2 p-0 text-left"><i class="fa fa-star" style="color: rgb(252, 128, 25);"></i> @Model.Rating</div>
+                    <div class="col-4 p-0 text-center">
+                        <i class="si si-clock"></i>
+                        @if (Model != null)
+                        {
+                            @if (Model.IsOpened)
+                            {<span style="color:green">Opened</span>}
+                            else
+                            { <span style="color:orangered">Closed</span>};
+}
+                    </div>
+                    <div class="col-6 p-0 text-center"><i class="si si-wallet"></i> @Model.PriceEstimate</div>
+                </div>
+            </div>
+        </div>
+    </a>
+</div>
+
+<div class="col-12 mt-10">
+    <div class="input-group">
+        <input type="text" class="form-control items-search-box" @bind="SearchItem" placeholder="Search for items...">
+        <div class="input-group-append"><span class="input-group-text items-search-box-icon"><i class="si si-magnifier"></i></span></div>
+    </div>
+</div>
+
+
+<div class="bg-grey-light mt-20">
+
+    @if (Model.Items != null && Model.Items.Count > 0)
+    {
+        var otherItems = Model.Items.ToList();
+
+
+        <div id="Beverages4">
+            <div class="Collapsible">
+                <span class="Collapsible__trigger is-open">This Restaurant Sells</span>
+                <div class="Collapsible__contentOuter" style="height: auto; transition: none 0s ease 0s; overflow: hidden;">
+                    <div class="Collapsible__contentInner">
+
+                        @foreach (var other in otherItems)
+                        {
+                            <div class="category-list-item" style="display: flex; justify-content: space-between;">
+                                <a href="/ItemDetails/@other.ItemId"><img src="/images/items/@other.ImageFile" alt="@other.ItemName" class="react-reveal flex-item-image" style="animation-fill-mode: both; animation-duration: 500ms; animation-delay: 0ms; animation-iteration-count: 1; opacity: 1; animation-name: react-reveal-505777936172311-1;"></a>
+                                <div class="flex-item-name">
+                                    <span class="item-name">@other.ItemName</span>
+                                    @if (other.IsNew)
+                                    {
+                                        <span class="item-badge" style="background-color: rgb(33, 150, 243);">New</span>
+                                    }
+                                    <br><span class="item-price"><span>Ksh. @string.Format("{0:N2}", other.SellingPrice)</span></span>
+                                </div>
+                                <div class="item-actions pull-right pb-0 mt-10">
+                                    <div class="btn-group btn-group-sm" role="group" aria-label="btnGroupIcons1">
+                                        <button type="button" class="btn btn-add-remove">
+                                            <span class="btn-dec"><span class="si si-pencil"></span></span>
+                                        </button>
+                                        <button type="button" class="btn btn-add-remove">
+                                            <span class="btn-inc">&times;</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    }
+    <div class="mb-50"></div>
+</div>
+
+
+
+@code {
+    [Parameter]
+    public int Id { get; set; }
+    [Parameter]
+    public string RestaurantName { get; set; }
+    public string SearchItem { get; set; }
+    public Restaurant Model { get; set; } = new Restaurant();
+    protected override async Task OnInitializedAsync()
+    {
+        Model = await RestaurantService.GetAsync(Id);
+        if (Model == null)
+            nav.NavigateTo("/MyRestaurants");
+    }
+
+}

@@ -10,7 +10,8 @@ namespace ODA.Entity
         [Required]
         [StringLength(255)]
         public string RegisteredName { get; set; }
-
+        [StringLength(180)]
+        public string MerchantId { get; set; }
         [Required]
         [StringLength(80)]
         public string ContactMobile { get; set; }
@@ -23,13 +24,13 @@ namespace ODA.Entity
         [StringLength(240)]
         public string ImageFile { get; set; } = "no_image.png";
 
-        [StringLength(50)]
         public string MoreInfo { get; set; }
         [StringLength(80)]
         public string PriceEstimate { get; set; } = "$$";
         public double Rating { get; set; } = 0;
         public int OpeningHours { get; set; } = 0;
         public int ClosingHours { get; set; } = 0;
+
         public bool IsOpened
         {
             get

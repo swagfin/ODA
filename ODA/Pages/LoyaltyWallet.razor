@@ -24,12 +24,8 @@
                 nav.NavigateTo("/login/redirect/LoyaltyWallet");
             else
             {
-                string customerEmailIdentity = IdentityUser.User.Identity.Name;
-                var customerInfo = await CustomerService.GetByEmailAsync(customerEmailIdentity);
-                if (customerInfo == null)
-                    throw new Exception($"No Customer found registered with this Email: {customerEmailIdentity}");
-                //Proceed
-                ACLoyaltyBalance = customerInfo.LoyaltyWalletBalance;
+                string customerId = IdentityUser.User.Claims.FirstOrDefault(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).Value;
+                ACLoyaltyBalance = await CustomerService.GetWalletBalanceAsync(customerId);
             }
         }
         catch (Exception)

@@ -88,14 +88,20 @@
                 NotificationMessage = "Oops, Email or Mobile Phone already registered, Try Again";
                 return;
             }
+
+            string Location = await session.GetItemAsync<string>(ODAConstants.userLocation.ToString());
+            if (string.IsNullOrWhiteSpace(Location))
+                Location = string.Empty;
             //Create a New Customer
             Customer customer = new Customer
             {
 
                 EmailAddress = User.EmailAddress,
                 FullName = User.FullName,
+                Location = Location,
                 Password = User.Password,
                 PhoneNumber = User.PrimaryMobile,
+                UserAccountType = ODAConstants.CustomerAC.ToString(),
             };
             //Call Our Service and Add Customer
             await customerService.AddAsync(customer);
@@ -107,7 +113,8 @@
                 EmailAddress = customer.EmailAddress,
                 FullName = customer.FullName,
                 IsAccountConfirmed = customer.IsAccountConfirmed,
-                Location = customer.Location,
+                Location = customer.Location ?? string.Empty,
+                Role = ODAConstants.CustomerAC.ToString(),
                 PhoneNumber = customer.PhoneNumber
             };
 
@@ -121,7 +128,7 @@
                 nav.NavigateTo(string.Format("/{0}", RedirectUrl));
 
         }
-        catch (Exception)
+        catch (Exception ex)
         {
             NotificationMessage = "Oops Unable to Register Account. Please Try Again Later";
         }

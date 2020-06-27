@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ODA.Migrations
 {
-    public partial class UpdatedItemEntity : Migration
+    public partial class initialMigrate : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -11,16 +11,18 @@ namespace ODA.Migrations
                 name: "Customers",
                 columns: table => new
                 {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    FirstName = table.Column<string>(maxLength: 120, nullable: false),
-                    LastName = table.Column<string>(maxLength: 120, nullable: true),
-                    PrimaryMobile = table.Column<string>(maxLength: 100, nullable: true),
-                    PrimaryEmail = table.Column<string>(maxLength: 100, nullable: true),
-                    Address = table.Column<string>(nullable: true),
+                    Id = table.Column<string>(nullable: false),
+                    FullName = table.Column<string>(maxLength: 220, nullable: false),
+                    PhoneNumber = table.Column<string>(maxLength: 120, nullable: true),
+                    Password = table.Column<string>(nullable: false),
+                    VerificationCode = table.Column<string>(nullable: false),
+                    IsAccountConfirmed = table.Column<bool>(nullable: false),
+                    EmailAddress = table.Column<string>(maxLength: 180, nullable: true),
+                    UserAccountType = table.Column<string>(maxLength: 110, nullable: false),
+                    Location = table.Column<string>(nullable: true),
                     PlacedOrders = table.Column<double>(nullable: false),
                     CancelledOrders = table.Column<double>(nullable: false),
-                    CompletedOrders = table.Column<double>(nullable: false),
+                    LoyaltyWalletBalance = table.Column<double>(nullable: false),
                     TokenKey = table.Column<string>(maxLength: 255, nullable: true)
                 },
                 constraints: table =>
@@ -117,7 +119,8 @@ namespace ODA.Migrations
                     OrderRef = table.Column<string>(maxLength: 250, nullable: true),
                     TransactionType = table.Column<string>(maxLength: 90, nullable: true),
                     RestaurantId = table.Column<int>(nullable: true),
-                    CustomerId = table.Column<int>(nullable: true),
+                    RestaurantName = table.Column<string>(nullable: true),
+                    CustomerId = table.Column<string>(nullable: true),
                     CustomerName = table.Column<string>(nullable: true),
                     CustomerMobile = table.Column<string>(nullable: true),
                     TotalItems = table.Column<int>(nullable: false),
@@ -174,7 +177,9 @@ namespace ODA.Migrations
                     ItemStatus = table.Column<string>(maxLength: 50, nullable: true),
                     ItemNote = table.Column<string>(maxLength: 210, nullable: true),
                     TokenKey = table.Column<string>(maxLength: 250, nullable: true),
-                    RegisteredDate = table.Column<DateTime>(nullable: false)
+                    RegisteredDate = table.Column<DateTime>(nullable: false),
+                    OrderRestaurantId = table.Column<int>(nullable: true),
+                    WaitTimeInMin = table.Column<double>(nullable: false)
                 },
                 constraints: table =>
                 {

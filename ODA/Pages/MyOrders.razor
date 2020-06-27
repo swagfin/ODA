@@ -68,7 +68,9 @@ else
     </div>
 }
 @code{
-    private IEnumerable<Order> MyOrdersList { get; set; }
+    private IEnumerable<Order>
+    MyOrdersList
+    { get; set; }
     protected override async Task OnInitializedAsync()
     {
         try
@@ -79,14 +81,11 @@ else
             else
             {
                 //Get User By Email Address
-                string customerEmailIdentity = IdentityUser.User.Identity.Name;
-                var customerInfo = await CustomerService.GetByEmailAsync(customerEmailIdentity);
-                if (customerInfo != null)
-                {
-                    var allOrders = await OrderService.GetOrdersByCustomerIdAsync(customerInfo.Id);
-                    //Dont Display Cancelled Orders
-                    MyOrdersList = allOrders.Where(x => x.OrderStatus != OrderStatus.Cancelled.ToString()).ToList();
-                }
+                string customerId = IdentityUser.User.Claims.FirstOrDefault(x => x.Type == System.Security.Claims.ClaimTypes.NameIdentifier).Value;
+                var allOrders = await OrderService.GetOrdersByCustomerIdAsync(customerId);
+                //Dont Display Cancelled Orders
+                MyOrdersList = allOrders.Where(x => x.OrderStatus != OrderStatus.Cancelled.ToString()).ToList();
+
             }            //Get Authenticated User
         }
         catch (Exception)

@@ -1,0 +1,48 @@
+﻿@page "/MyRestaurants"
+@attribute [Authorize(Roles = "MerchantAC")]
+@inject IRestaurantService RestaurantService
+@inject AuthenticationStateProvider StateProvider
+<h3>My Restaurants</h3>
+
+@if (allRestaurants == null)
+{
+    <ContentLoader />
+}
+else if (allRestaurants.Count() < 1)
+{
+    <p>You Dont have any Restaurants yet</p>
+    <a class="btn-alt-primary" href="/MyRestaurants/Add">Add Restaurant</a>
+}
+else
+{
+
+    foreach (var item in allRestaurants)
+    {
+        <p>
+            <a href="/MyRestaurant/@item.Id/@item.RegisteredName">@item.RegisteredName</a>
+            <span><a href="/MyRestaurants/@item.Id/@item.RegisteredName"><i>View</i></a> </span><span><a href="/MyRestaurants/Delete/@item.Id/@item.RegisteredName" style="color:red"><i>Delete</i></a> </span>
+        </p>
+    }
+
+}
+
+@code {
+
+    private IEnumerable<Restaurant> allRestaurants { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var userState = await StateProvider.GetAuthenticationStateAsync();
+            if (userState.User.Identity == null)
+                throw new Exception("Not Found");
+            //Proceed
+            string customerId = userState.User.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier).Value;
+            allRestaurants = await RestaurantService.GetAllByMerchantIdAsync(customerId);
+        }
+        catch (Exception)
+        {
+
+        }
+    }
+}

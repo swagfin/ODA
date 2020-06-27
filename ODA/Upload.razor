@@ -1,0 +1,57 @@
+﻿@page "/Upload"
+@inject IBlazorInputFileService fileService
+<br />
+<br />
+
+<InputFile OnChange="HandleFileInputChange" />
+
+<br />
+<br />
+@if (IsUploading)
+{
+    <p><i>Uploading Image....</i></p>
+}
+else if (!string.IsNullOrWhiteSpace(ImageFile))
+{
+    <img src="/images/restaurants/@ImageFile" height="300" width="280" />
+}
+
+@if (uploadedFile != null)
+{
+    <p style="color:red">@ExceptionMsg</p>
+    <p>Name: @uploadedFile.Name</p>
+    <p>Type: @uploadedFile.Type</p>
+    <p>Size: @(uploadedFile.Size /1024)</p>
+}
+
+@code{
+
+    private IFileListEntry uploadedFile { get; set; }
+    private string ExceptionMsg { get; set; }
+    private string ImageFile { get; set; }
+    private bool IsUploading { get; set; }
+    async Task HandleFileInputChange(IFileListEntry[] files)
+    {
+        try
+        {
+            ExceptionMsg = string.Empty;
+            ImageFile = string.Empty;
+            uploadedFile = files.FirstOrDefault();
+            if (uploadedFile != null)
+            {
+                IsUploading = true;
+                ImageFile = await fileService.UploadAsync(uploadedFile, "restaurants");
+            }
+        }
+        catch (Exception ex)
+        {
+            ExceptionMsg = ex.Message;
+        }
+        finally
+        {
+            IsUploading = false;
+        }
+
+    }
+
+}

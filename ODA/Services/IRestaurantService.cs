@@ -12,5 +12,6 @@ namespace ODA.Services
         Task UpdateAsync(Restaurant restaurant);
         Task RemoveAsync(int Id);
         Task RemoveAsync(Restaurant restaurant);
+        Task<IEnumerable<Restaurant>> GetAllByMerchantIdAsync(string merchantId);
     }
 }

@@ -35,12 +35,23 @@ namespace ODA.Services.Implementations
                 return Db.Restaurants.Where(x => x.Location.ToLower().Contains(location)).AsNoTracking().ToList();
             return Db.Restaurants.AsNoTracking().ToList();
         }
+        public IEnumerable<Restaurant> GetAllByMerchantId(string merchantId)
+        {
+            return Db.Restaurants.Where(x => x.MerchantId == merchantId).AsNoTracking().ToList();
+        }
 
         public Task<IEnumerable<Restaurant>> GetAllAsync(string location = null)
         {
             return Task.Run(() =>
             {
                 return GetAll(location);
+            });
+        }
+        public Task<IEnumerable<Restaurant>> GetAllByMerchantIdAsync(string merchantId)
+        {
+            return Task.Run(() =>
+            {
+                return GetAllByMerchantId(merchantId);
             });
         }
 

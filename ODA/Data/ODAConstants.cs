@@ -11,5 +11,8 @@ namespace ODA
         userId,
         shoppingCart,
         shoppingCartItems,
+        //Account Types
+        MerchantAC,
+        CustomerAC,
     }
 }

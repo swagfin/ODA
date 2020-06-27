@@ -104,12 +104,12 @@ namespace ODA.Services.Implementations
             });
         }
 
-        public IEnumerable<Order> GetAllByCustomerId(int CustomerId)
+        public IEnumerable<Order> GetAllByCustomerId(string CustomerId)
         {
             return Db.Orders.Include(x => x.Restaurant).Include(x => x.OrderItems).Where(x => x.CustomerId == CustomerId).OrderByDescending(x => x.Id).AsNoTracking().ToList();
         }
 
-        public Task<IEnumerable<Order>> GetOrdersByCustomerIdAsync(int customerId)
+        public Task<IEnumerable<Order>> GetOrdersByCustomerIdAsync(string customerId)
         {
             return Task.Run(() =>
             {

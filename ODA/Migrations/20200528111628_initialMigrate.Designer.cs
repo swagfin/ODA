@@ -10,8 +10,8 @@ using ODA.Context;
 namespace ODA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200523184402_UpdatedCustomer")]
-    partial class UpdatedCustomer
+    [Migration("20200528111628_initialMigrate")]
+    partial class initialMigrate
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -23,21 +23,20 @@ namespace ODA.Migrations
 
             modelBuilder.Entity("ODA.Entity.Customer", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<double>("CancelledOrders")
                         .HasColumnType("float");
 
-                    b.Property<double>("CompletedOrders")
-                        .HasColumnType("float");
+                    b.Property<string>("EmailAddress")
+                        .HasColumnType("nvarchar(180)")
+                        .HasMaxLength(180);
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasColumnType("nvarchar(220)")
+                        .HasMaxLength(220);
 
                     b.Property<bool>("IsAccountConfirmed")
                         .HasColumnType("bit");
@@ -45,24 +44,28 @@ namespace ODA.Migrations
                     b.Property<string>("Location")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<double>("LoyaltyWalletBalance")
+                        .HasColumnType("float");
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PhoneNumber")
+                        .HasColumnType("nvarchar(120)")
+                        .HasMaxLength(120);
+
                     b.Property<double>("PlacedOrders")
                         .HasColumnType("float");
-
-                    b.Property<string>("PrimaryEmail")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("PrimaryMobile")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
 
                     b.Property<string>("TokenKey")
                         .HasColumnType("nvarchar(255)")
                         .HasMaxLength(255);
+
+                    b.Property<string>("UserAccountType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(110)")
+                        .HasMaxLength(110);
 
                     b.Property<string>("VerificationCode")
                         .IsRequired()
@@ -180,8 +183,8 @@ namespace ODA.Migrations
                     b.Property<double>("ChangeAmount")
                         .HasColumnType("float");
 
-                    b.Property<int?>("CustomerId")
-                        .HasColumnType("int");
+                    b.Property<string>("CustomerId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CustomerMobile")
                         .HasColumnType("nvarchar(max)");
@@ -228,6 +231,9 @@ namespace ODA.Migrations
 
                     b.Property<int?>("RestaurantId")
                         .HasColumnType("int");
+
+                    b.Property<string>("RestaurantName")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<double>("SubTotal")
                         .HasColumnType("float");

@@ -2,16 +2,10 @@
 
 namespace ODA.Migrations
 {
-    public partial class DemoData : Migration
+    public partial class demoDb : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            //Add Customers
-            migrationBuilder.Sql(@"
-SET IDENTITY_INSERT [dbo].[Customers] ON
-INSERT INTO [dbo].[Customers] ([Id], [FirstName], [LastName], [PrimaryMobile], [PrimaryEmail], [Address], [PlacedOrders], [CancelledOrders], [CompletedOrders], [TokenKey]) VALUES (1, N'George', N'Wainaina', N'0734666567', N'georgewainaina18@gmail.com', N'Nakuru', 0, 0, 0, N'dsicugshdfnm34lp58u3yghbrjn3!!W2rrd')
-SET IDENTITY_INSERT [dbo].[Customers] OFF
-");
             //Add Demo Categories
             migrationBuilder.Sql(@"
 SET IDENTITY_INSERT [dbo].[ItemCategories] ON

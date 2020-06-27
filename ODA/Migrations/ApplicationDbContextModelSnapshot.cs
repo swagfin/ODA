@@ -21,10 +21,8 @@ namespace ODA.Migrations
 
             modelBuilder.Entity("ODA.Entity.Customer", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<double>("CancelledOrders")
                         .HasColumnType("float");
@@ -61,6 +59,11 @@ namespace ODA.Migrations
                     b.Property<string>("TokenKey")
                         .HasColumnType("nvarchar(255)")
                         .HasMaxLength(255);
+
+                    b.Property<string>("UserAccountType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(110)")
+                        .HasMaxLength(110);
 
                     b.Property<string>("VerificationCode")
                         .IsRequired()
@@ -178,8 +181,8 @@ namespace ODA.Migrations
                     b.Property<double>("ChangeAmount")
                         .HasColumnType("float");
 
-                    b.Property<int?>("CustomerId")
-                        .HasColumnType("int");
+                    b.Property<string>("CustomerId")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("CustomerMobile")
                         .HasColumnType("nvarchar(max)");
@@ -355,9 +358,12 @@ namespace ODA.Migrations
                         .HasColumnType("nvarchar(180)")
                         .HasMaxLength(180);
 
+                    b.Property<string>("MerchantId")
+                        .HasColumnType("nvarchar(180)")
+                        .HasMaxLength(180);
+
                     b.Property<string>("MoreInfo")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("OpeningHours")
                         .HasColumnType("int");

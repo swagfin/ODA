@@ -43,12 +43,12 @@ namespace ODA.Services.Implementations
             });
         }
 
-        public Customer Get(int Id)
+        public Customer Get(string Id)
         {
             return Db.Customers.FirstOrDefault(x => x.Id == Id);
         }
 
-        public Task<Customer> GetAsync(int Id)
+        public Task<Customer> GetAsync(string Id)
         {
             return Task.Run(() =>
             {
@@ -84,13 +84,13 @@ namespace ODA.Services.Implementations
             });
         }
 
-        public void Remove(int Id)
+        public void Remove(string Id)
         {
             var customer = Get(Id);
             Remove(customer);
         }
 
-        public Task RemoveAsync(int Id)
+        public Task RemoveAsync(string Id)
         {
             return Task.Run(() =>
             {
@@ -150,6 +150,21 @@ namespace ODA.Services.Implementations
             return Task.Run(() =>
             {
                 return GetByEmail(emailAddress);
+            });
+        }
+
+        public double GetWalletBalance(string Id)
+        {
+            var results = Db.Customers.Select(x => new { x.LoyaltyWalletBalance, x.Id }).Where(x => x.Id == Id).AsNoTracking().FirstOrDefault();
+            if (results != null)
+                return results.LoyaltyWalletBalance;
+            return 0;
+        }
+        public Task<double> GetWalletBalanceAsync(string Id)
+        {
+            return Task.Run(() =>
+            {
+                return GetWalletBalance(Id);
             });
         }
     }
