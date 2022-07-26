@@ -10,8 +10,8 @@ using ODA.Context;
 namespace ODA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200817201433_AppliedPendingDemos")]
-    partial class AppliedPendingDemos
+    [Migration("20220726161221_initDemoData")]
+    partial class initDemoData
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {

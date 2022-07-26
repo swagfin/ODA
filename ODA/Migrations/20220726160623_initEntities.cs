@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace ODA.Migrations
 {
-    public partial class initialMigrate : Migration
+    public partial class initEntities : Migration
     {
         protected override void Up(MigrationBuilder migrationBuilder)
         {
@@ -65,11 +65,12 @@ namespace ODA.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RegisteredName = table.Column<string>(maxLength: 255, nullable: false),
+                    MerchantId = table.Column<string>(maxLength: 180, nullable: true),
                     ContactMobile = table.Column<string>(maxLength: 80, nullable: false),
                     ContactEmail = table.Column<string>(maxLength: 95, nullable: false),
                     Location = table.Column<string>(maxLength: 180, nullable: true),
                     ImageFile = table.Column<string>(maxLength: 240, nullable: true),
-                    MoreInfo = table.Column<string>(maxLength: 50, nullable: true),
+                    MoreInfo = table.Column<string>(nullable: true),
                     PriceEstimate = table.Column<string>(maxLength: 80, nullable: true),
                     Rating = table.Column<double>(nullable: false),
                     OpeningHours = table.Column<int>(nullable: false),

@@ -10,8 +10,8 @@ using ODA.Context;
 namespace ODA.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20200528111628_initialMigrate")]
-    partial class initialMigrate
+    [Migration("20220726160623_initEntities")]
+    partial class initEntities
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -360,9 +360,12 @@ namespace ODA.Migrations
                         .HasColumnType("nvarchar(180)")
                         .HasMaxLength(180);
 
+                    b.Property<string>("MerchantId")
+                        .HasColumnType("nvarchar(180)")
+                        .HasMaxLength(180);
+
                     b.Property<string>("MoreInfo")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("OpeningHours")
                         .HasColumnType("int");
